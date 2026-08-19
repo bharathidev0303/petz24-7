@@ -1,0 +1,44 @@
+import React from 'react';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import AppText from '../AppText';
+import Downarrow from '../icons/downArrow';
+
+const LabeledSelector = ({
+  value,
+  placeholder = 'Select an option',
+  onPress,
+  style,
+  disabled = false,
+  sufix = true,
+}) => (
+  <TouchableOpacity
+    activeOpacity={0.7}
+    onPress={onPress}
+    disabled={disabled}
+    style={[styles.container, disabled && styles.disabled, style]}>
+    <AppText fontFamily="Regular" numberOfLines={1} style={[styles.text, !value && styles.placeholder]}>
+      {value || placeholder}
+    </AppText>
+    {sufix && <Downarrow />}
+  </TouchableOpacity>
+);
+
+const styles = StyleSheet.create({
+  container: {
+    marginVertical: 10,
+    borderWidth: 1.5,
+    borderColor: '#E3E3E3',
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+  },
+  text: { fontSize: 15, color: '#000', flex: 1 },
+  placeholder: { color: '#999' },
+  disabled: { opacity: 0.6, backgroundColor: '#F5F5F5' },
+});
+
+export default LabeledSelector;
