@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 8,
   },
-  primaryButton: { backgroundColor: colors.primary },
+  primaryButton: { backgroundColor: colors.button },
   secondaryButton: { backgroundColor: colors.lightGray, borderWidth: 1, borderColor: colors.border },
   disabledButton: { backgroundColor: colors.loginButtonBackgroundColor },
   text: { fontSize: 18, fontWeight: '600' },

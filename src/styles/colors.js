@@ -1,6 +1,7 @@
 export const colors = {
-  primary: '#FF9A3E',
-  primaryLight: '#FFB366',
+  primary: '#AB041F',
+  primaryLight: '#C9354D',
+  button: '#06294F',
   background: '#FFFFFF',
   text: '#2D3436',
   textSecondary: '#636E72',
@@ -16,4 +17,6 @@ export const colors = {
   lightGray: '#F0F3F4',
   primaryText: '#2B2B2B',
   secondaryText: '#777777',
+  homeHeader: '#FFF0E6',
+  homeBody: '#F5F7FA',
 };

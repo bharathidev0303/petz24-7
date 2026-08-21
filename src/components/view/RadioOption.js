@@ -34,9 +34,9 @@ const styles = StyleSheet.create({
   radioOption: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.4 },
   radio: { alignItems: 'center', justifyContent: 'center' },
-  radioSelected: { borderColor: '#F7941E' },
+  radioSelected: { borderColor: colors.primary },
   radioSelectedText: { fontFamily: Fonts.Bold, fontWeight: '600', color: colors.primaryText },
-  radioInner: { width: 7, height: 7, borderRadius: 5, backgroundColor: '#F7941E' },
+  radioInner: { width: 7, height: 7, borderRadius: 5, backgroundColor: colors.primary },
   radioText: { fontSize: 13, color: colors.secondaryText, fontFamily: Fonts.Regular },
 });
 

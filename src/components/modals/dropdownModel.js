@@ -40,7 +40,7 @@ const DropdownModal = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   modalItemTextSelected: { color: colors.primary, fontWeight: '500' },
   emptyText: { textAlign: 'center', paddingVertical: 40, fontSize: 16, color: '#999' },
   applyButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.button,
     marginHorizontal: 16,
     borderRadius: 8,
     paddingVertical: 14,

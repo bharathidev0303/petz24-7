@@ -1,9 +1,11 @@
 import { TouchableOpacity } from 'react-native';
 import AppText from '../AppText';
 
+import { colors } from '../../styles/colors';
+
 const TextButton = ({
   children,
-  color = '#F7941E',
+  color = colors.button,
   fontWeight,
   fontFamily = 'Regular',
   fontSize,

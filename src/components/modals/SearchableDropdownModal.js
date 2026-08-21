@@ -156,9 +156,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.button,
   },
-  addButtonText: { fontSize: 14, fontWeight: '500', color: colors.primary },
+  addButtonText: { fontSize: 14, fontWeight: '500', color: colors.button },
 });
 
 export default SearchableDropdownModal;

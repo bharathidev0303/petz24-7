@@ -2,13 +2,31 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../../api/auth';
 import apiClient from '../../api/apiClient';
+import { getUserErrorMessage } from '../../utils/apiError';
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }) => {
-    const response = await authAPI.login(email, password);
-    await apiClient.setToken(response.data.token);
-    return response.data;
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.login(email, password);
+      await apiClient.setToken(response.token);
+      return response;
+    } catch (error) {
+      return rejectWithValue(getUserErrorMessage(error, 'Login failed. Please try again.'));
+    }
+  },
+);
+
+export const signup = createAsyncThunk(
+  'auth/signup',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.signup(payload);
+      await apiClient.setToken(response.token);
+      return response;
+    } catch (error) {
+      return rejectWithValue(getUserErrorMessage(error, 'Registration failed. Please try again.'));
+    }
   },
 );
 
@@ -47,6 +65,12 @@ const authSlice = createSlice({
     clearError: state => {
       state.error = null;
     },
+    clearAuth: state => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.token = null;
+      state.loading = false;
+    },
   },
   extraReducers: builder => {
     builder
@@ -63,7 +87,22 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(signup.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signup.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.authInitialized = true;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+      })
+      .addCase(signup.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       })
       .addCase(checkAuthStatus.pending, state => {
         state.loading = true;
@@ -89,5 +128,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, clearAuth } = authSlice.actions;
 export default authSlice.reducer;

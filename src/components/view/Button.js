@@ -1,12 +1,13 @@
 import React from 'react';
 import { TouchableOpacity, View, ActivityIndicator, StyleSheet } from 'react-native';
 import AppText from './AppText';
+import { colors } from '../../styles/colors';
 
 const Button = ({
   children,
   onPress,
   loading = false,
-  backgroundColor = '#F7941E',
+  backgroundColor = colors.button,
   disabled = false,
   style,
   textStyle,

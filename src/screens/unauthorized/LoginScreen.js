@@ -5,18 +5,24 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  Image,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import { colors } from '../../styles/colors';
 import { login, clearError } from '../../redux/slices/authSlice';
 
+const logoSource = require('../../assets/app-logo.png');
+
 const LoginScreen = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { loading, error } = useSelector(state => state.auth);
-  const [email, setEmail] = useState('demo@petz247.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('testdata@gmail.com');
+  const [password, setPassword] = useState('1234');
 
   const handleLogin = () => {
     dispatch(clearError());
@@ -28,7 +34,7 @@ const LoginScreen = () => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.card}>
-        <AppText style={styles.title}>petz24-7</AppText>
+        <Image source={logoSource} style={styles.logo} resizeMode="contain" />
         <AppText style={styles.subtitle}>Sign in to continue</AppText>
 
         <TextInput
@@ -56,9 +62,11 @@ const LoginScreen = () => {
           Login
         </Button>
 
-        <AppText style={styles.hint}>
-          Dummy login – any email/password works
-        </AppText>
+        <Pressable onPress={() => navigation.navigate('Signup')} style={styles.linkWrap}>
+          <AppText style={styles.linkText}>
+            New user? <AppText style={styles.linkHighlight}>Create an account</AppText>
+          </AppText>
+        </Pressable>
       </View>
     </KeyboardAvoidingView>
   );
@@ -76,11 +84,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 24,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.primaryText,
-    marginBottom: 4,
+  logo: {
+    width: '100%',
+    height: 56,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
@@ -101,11 +108,17 @@ const styles = StyleSheet.create({
     color: colors.error,
     marginBottom: 12,
   },
-  hint: {
-    marginTop: 16,
-    fontSize: 13,
+  linkWrap: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  linkText: {
+    fontSize: 14,
     color: colors.secondaryText,
-    textAlign: 'center',
+  },
+  linkHighlight: {
+    color: colors.primary,
+    fontWeight: '700',
   },
 });
 

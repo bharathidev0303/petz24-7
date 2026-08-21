@@ -1,35 +1,47 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from './apiClient';
+import { ENDPOINTS } from './endpoints';
+
+const mapUser = data => ({
+  id: data.user_id,
+  firstName: data.first_name,
+  lastName: data.last_name,
+  name: [data.first_name, data.last_name].filter(Boolean).join(' '),
+  email: data.email_id,
+  mobile: data.mobile_number,
+});
 
 export const authAPI = {
-  login: async (email, password) => {
-    // Dummy login – replace with real endpoint when backend is ready
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
+  login: async (email_id, password) => {
+    const response = await apiClient.post(ENDPOINTS.LOGIN, { email_id, password });
+    const user = mapUser(response.data);
 
-    const mockUser = {
-      id: 1,
-      name: 'Pet Owner',
-      email,
-    };
-
-    const mockToken = `dummy-token-${Date.now()}`;
-
-    await AsyncStorage.setItem('authToken', mockToken);
-    await AsyncStorage.setItem('userData', JSON.stringify(mockUser));
+    await AsyncStorage.setItem('authToken', response.data.token);
+    await AsyncStorage.setItem('userData', JSON.stringify(user));
 
     return {
-      success: true,
-      data: {
-        token: mockToken,
-        user: mockUser,
-      },
+      token: response.data.token,
+      user,
     };
   },
 
-  getProfile: async () => {
-    return apiClient.get('/users/1');
+  signup: async ({ first_name, last_name, email_id, mobile_number, password }) => {
+    const response = await apiClient.post(ENDPOINTS.SIGNUP, {
+      first_name,
+      last_name,
+      email_id,
+      mobile_number,
+      password,
+    });
+    const user = mapUser(response.data);
+
+    await AsyncStorage.setItem('authToken', response.data.token);
+    await AsyncStorage.setItem('userData', JSON.stringify(user));
+
+    return {
+      token: response.data.token,
+      user,
+    };
   },
 
   logout: async () => {
