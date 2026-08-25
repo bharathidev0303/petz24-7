@@ -3,7 +3,8 @@ import { View, TextInput, StyleSheet, Image, Pressable, Animated, StatusBar } fr
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, Filter, Close } from '../icons';
 import AppText from './AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const logoSource = require('../../assets/app-logo.png');
 
@@ -17,14 +18,18 @@ const AppHeader = ({
   showSearch = true,
   searchEditable = true,
   autoFocusSearch = false,
-  backgroundColor = colors.homeHeader,
-  searchBackgroundColor = colors.inputBackground,
+  backgroundColor,
+  searchBackgroundColor,
   title,
   showLogo = true,
   showFilter = false,
   onFilterPress,
   filterActive = false,
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors, isDark } = useTheme();
+  const resolvedBackground = backgroundColor ?? colors.homeHeader;
+  const resolvedSearchBackground = searchBackgroundColor ?? colors.inputBackground;
   const insets = useSafeAreaInsets();
   const inputRef = useRef(null);
   const logoScale = useRef(new Animated.Value(1)).current;
@@ -70,11 +75,11 @@ const AppHeader = ({
   return (
     <>
       <StatusBar
-        backgroundColor={backgroundColor}
-        barStyle="dark-content"
+        backgroundColor={resolvedBackground}
+        barStyle={isDark ? 'light-content' : 'dark-content'}
         translucent={false}
       />
-      <View style={[styles.container, { paddingTop: insets.top + 8, backgroundColor }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 8, backgroundColor: resolvedBackground }]}>
         <View style={styles.row}>
           {showLogo ? (
             <Pressable onPress={handleLogoPress} hitSlop={8}>
@@ -86,7 +91,7 @@ const AppHeader = ({
 
           {showSearch ? (
             <Pressable
-              style={[styles.searchRow, { backgroundColor: searchBackgroundColor }]}
+              style={[styles.searchRow, { backgroundColor: resolvedSearchBackground }]}
               onPress={handleSearchPress}
               disabled={searchEditable}>
               <Search width={18} height={18} color={colors.gray} />
@@ -137,7 +142,7 @@ const AppHeader = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     paddingHorizontal: 16,
     paddingBottom: 12,

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, StyleSheet, Animated, TouchableOpacity } from 'react-native';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import InputEyeClose from '../icons/InputEyeClose';
 import InputEyeOpen from '../icons/InputEyeOpen';
 import AppText from './AppText';
@@ -22,6 +23,8 @@ const CustomInput = ({
   rightComponent = null,
   ...props
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const floatingLabelAnim = useRef(new Animated.Value(value ? 1 : 0)).current;
@@ -116,7 +119,7 @@ const CustomInput = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: { marginBottom: 16 },
   inputContainer: {
     flexDirection: 'row',

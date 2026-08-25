@@ -12,18 +12,21 @@ import { useSelector } from 'react-redux';
 import AppText from '../../components/AppText';
 import ScreenLayout from '../../components/view/ScreenLayout';
 import { Orders as OrdersIcon } from '../../components/icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { ordersAPI } from '../../api/orders';
 
 const PAGE_SIZE = 10;
 
-const statusColor = status => {
+const statusColor = (status, colors) => {
   if (status === 'Cancelled') return colors.error;
   if (status === 'Shipped' || status === 'Confirmed') return colors.success;
   return colors.primary;
 };
 
 const OrdersScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const { user } = useSelector(state => state.auth);
   const [allOrders, setAllOrders] = useState([]);
@@ -94,8 +97,8 @@ const OrdersScreen = () => {
       onPress={() => navigation.navigate('OrderDetail', { order: item })}>
       <View style={styles.orderHeader}>
         <AppText style={styles.orderNumber}>{item.order_number}</AppText>
-        <View style={[styles.statusBadge, { backgroundColor: `${statusColor(item.order_status)}20` }]}>
-          <AppText style={[styles.statusText, { color: statusColor(item.order_status) }]}>
+        <View style={[styles.statusBadge, { backgroundColor: `${statusColor(item.order_status, colors)}20` }]}>
+          <AppText style={[styles.statusText, { color: statusColor(item.order_status, colors) }]}>
             {item.order_status}
           </AppText>
         </View>
@@ -207,7 +210,7 @@ const OrdersScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   centered: {
     flex: 1,
     alignItems: 'center',

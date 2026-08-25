@@ -33,3 +33,4 @@ export { default as Check } from './Check';
 export { default as Paw } from './Paw';
 export { default as Doctor } from './Doctor';
 export { default as Plan } from './Plan';
+export { default as VegNonVegIcon } from './VegNonVegIcon';

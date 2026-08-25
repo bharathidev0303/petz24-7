@@ -1,80 +1,90 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import AppText from './AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const ICON_SIZE = 20;
 const CIRCLE_SIZE = 46;
 const COMPLETED_BG = '#052a50';
 
-const BookingStepIndicator = ({ steps, currentStep }) => (
-  <View style={styles.wrapper}>
-    <View style={styles.row}>
-      {steps.map((step, index) => {
-        const stepNumber = index + 1;
-        const isCompleted = stepNumber < currentStep;
-        const isActive = stepNumber === currentStep;
-        const isFirst = index === 0;
-        const isLast = index === steps.length - 1;
-        const Icon = step.Icon;
-        const iconColor = isActive || isCompleted ? colors.white : colors.secondaryText;
-        const lineActive = isCompleted || isActive;
+const BookingStepIndicator = ({ steps, currentStep }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
 
-        return (
-          <View key={step.id} style={styles.stepItem}>
-            <View style={styles.trackRow}>
-              <View
-                style={[
-                  styles.line,
-                  isFirst && styles.lineHidden,
-                  lineActive && !isFirst && styles.lineCompleted,
-                ]}
-              />
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.row}>
+        {steps.map((step, index) => {
+          const stepNumber = index + 1;
+          const isCompleted = stepNumber < currentStep;
+          const isActive = stepNumber === currentStep;
+          const isFirst = index === 0;
+          const isLast = index === steps.length - 1;
+          const Icon = step.Icon;
+          const iconColor = isActive || isCompleted ? colors.white : colors.secondaryText;
+          const lineActive = isCompleted || isActive;
 
-              <View
-                style={[
-                  styles.circle,
-                  isCompleted && styles.circleCompleted,
-                  isActive && styles.circleActive,
-                ]}>
-                {Icon ? (
-                  <Icon width={ICON_SIZE} height={ICON_SIZE} color={iconColor} />
-                ) : (
-                  <AppText
-                    style={[
-                      styles.fallbackText,
-                      isActive && styles.fallbackTextActive,
-                      isCompleted && styles.fallbackTextCompleted,
-                    ]}>
-                    {stepNumber}
-                  </AppText>
-                )}
+          return (
+            <View key={step.id} style={styles.stepItem}>
+              <View style={styles.trackRow}>
+                <View
+                  style={[
+                    styles.line,
+                    isFirst && styles.lineHidden,
+                    lineActive && !isFirst && styles.lineCompleted,
+                  ]}
+                />
+
+                <View
+                  style={[
+                    styles.circle,
+                    isCompleted && styles.circleCompleted,
+                    isActive && styles.circleActive,
+                  ]}>
+                  {Icon ? (
+                    <Icon width={ICON_SIZE} height={ICON_SIZE} color={iconColor} />
+                  ) : (
+                    <AppText
+                      style={[
+                        styles.fallbackText,
+                        isActive && styles.fallbackTextActive,
+                        isCompleted && styles.fallbackTextCompleted,
+                      ]}>
+                      {stepNumber}
+                    </AppText>
+                  )}
+                </View>
+
+                <View
+                  style={[
+                    styles.line,
+                    isLast && styles.lineHidden,
+                    isCompleted && !isLast && styles.lineCompleted,
+                  ]}
+                />
               </View>
 
-              <View
+              <AppText
                 style={[
-                  styles.line,
-                  isLast && styles.lineHidden,
-                  isCompleted && !isLast && styles.lineCompleted,
+                  styles.label,
+                  isActive && styles.labelActive,
+                  isCompleted && styles.labelCompleted,
                 ]}
-              />
+                numberOfLines={2}>
+                {step.label}
+              </AppText>
             </View>
-
-            <AppText
-              style={[styles.label, isActive && styles.labelActive, isCompleted && styles.labelCompleted]}
-              numberOfLines={2}>
-              {step.label}
-            </AppText>
-          </View>
-        );
-      })}
+          );
+        })}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   wrapper: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     paddingHorizontal: 8,
@@ -114,7 +124,7 @@ const styles = StyleSheet.create({
     borderRadius: CIRCLE_SIZE / 2,
     borderWidth: 2,
     borderColor: colors.border,
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 4,

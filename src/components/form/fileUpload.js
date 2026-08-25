@@ -5,7 +5,8 @@ import AppView from '../AppView';
 import Upload from '../icons/Upload';
 import EyeOpen from '../icons/EyeOpen';
 import ModalClose from '../icons/modalClose';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const FileUpload = ({
   placeholder = 'Upload file',
@@ -21,6 +22,8 @@ const FileUpload = ({
   error,
   onPreview,
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const openFilePicker = () => {
     if (disabled) return;
 
@@ -97,7 +100,7 @@ const FileUpload = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     borderWidth: 1.5,
     borderStyle: 'dashed',

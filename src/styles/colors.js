@@ -1,22 +1,4 @@
-export const colors = {
-  primary: '#AB041F',
-  primaryLight: '#C9354D',
-  button: '#06294F',
-  background: '#FFFFFF',
-  text: '#2D3436',
-  textSecondary: '#636E72',
-  border: '#DFE6E9',
-  loginInputBorderColor: '#E3E3E3',
-  loginButtonBackgroundColor: '#D3D4D6',
-  inputBackground: '#F5F6FA',
-  success: '#00B894',
-  error: '#D63031',
-  white: '#FFFFFF',
-  black: '#000000',
-  gray: '#B2BEC3',
-  lightGray: '#F0F3F4',
-  primaryText: '#2B2B2B',
-  secondaryText: '#777777',
-  homeHeader: '#FFF0E6',
-  homeBody: '#F5F7FA',
-};
+import { lightColors } from '../theme/buildTheme';
+
+/** @deprecated Use useTheme() or useThemeColors() instead */
+export const colors = lightColors;

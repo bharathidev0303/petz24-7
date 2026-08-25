@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/authorized/HomeScreen';
 import CartScreen from '../screens/authorized/CartScreen';
@@ -10,10 +10,11 @@ import MenuBottomSheet from '../components/view/MenuBottomSheet';
 import { useMenuSheet } from '../context/MenuSheetContext';
 import { useSidebar } from '../context/SidebarContext';
 import { Home, Cart, Orders, Menu, UpArrow, ChevronDown } from '../components/icons';
-import { colors } from '../styles/colors';
+import { useThemedStyles } from '../theme/useThemedStyles';
+import { useTheme } from '../theme/ThemeContext';
 import {
-  TAB_BAR_STYLE,
-  TAB_BAR_STYLE_COMPACT,
+  getTabBarStyle,
+  getTabBarStyleCompact,
   TAB_LABEL_STYLE,
 } from './tabBarConfig';
 
@@ -26,6 +27,8 @@ const tabIcons = {
 };
 
 const BottomTabNavigatorContent = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const { toggleMenuSheet, closeMenuSheet, visible: menuOpen } = useMenuSheet();
   const { toggleSidebar, closeSidebar, visible: sidebarOpen } = useSidebar();
 
@@ -64,7 +67,7 @@ const BottomTabNavigatorContent = () => {
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.secondaryText,
           tabBarLabelStyle: TAB_LABEL_STYLE,
-          tabBarStyle: menuOpen ? TAB_BAR_STYLE_COMPACT : TAB_BAR_STYLE,
+          tabBarStyle: menuOpen ? getTabBarStyleCompact(colors) : getTabBarStyle(colors),
           tabBarIcon: ({ color, size, focused }) => {
             const Icon = tabIcons[route.name];
             return Icon ? (
@@ -126,7 +129,7 @@ const BottomTabNavigatorContent = () => {
 
 const BottomTabNavigator = () => <BottomTabNavigatorContent />;
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   navWrap: {
     flex: 1,
   },

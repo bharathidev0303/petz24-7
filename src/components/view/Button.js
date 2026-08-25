@@ -1,33 +1,49 @@
 import React from 'react';
-import { TouchableOpacity, View, ActivityIndicator, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import AppText from './AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const Button = ({
   children,
   onPress,
   loading = false,
-  backgroundColor = colors.button,
+  backgroundColor,
   disabled = false,
   style,
   textStyle,
   testID,
 }) => {
+  const { colors, scaleFont } = useTheme();
+  const styles = useThemedStyles(createStyles);
+
+  const resolvedBackground = backgroundColor ?? colors.button;
+  const resolvedTextColor = textStyle?.color ?? colors.buttonText;
   const isDisabled = disabled || loading;
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={isDisabled ? null : onPress}
-      style={[styles.button, isDisabled && styles.disabled, style, { backgroundColor }]}
+      style={[
+        styles.button,
+        { borderRadius: colors.buttonRadius },
+        isDisabled && styles.disabled,
+        style,
+        { backgroundColor: resolvedBackground },
+      ]}
       disabled={isDisabled}
       testID={testID}>
       {loading ? (
-        <ActivityIndicator size="small" color="#fff" />
+        <ActivityIndicator size="small" color={resolvedTextColor} />
       ) : (
         <View>
           {typeof children === 'string' || typeof children === 'number' ? (
-            <AppText style={[styles.text, textStyle]}>{children}</AppText>
+            <AppText
+              color={resolvedTextColor}
+              style={[styles.text, { fontSize: scaleFont(16) }, textStyle]}>
+              {children}
+            </AppText>
           ) : (
             children
           )}
@@ -37,15 +53,14 @@ const Button = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = () => ({
   button: {
     paddingVertical: 12,
     paddingHorizontal: 18,
-    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  text: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  text: { fontWeight: '600' },
   disabled: { opacity: 0.6 },
 });
 

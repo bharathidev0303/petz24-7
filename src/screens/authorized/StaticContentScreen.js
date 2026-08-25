@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-nat
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { VET_PHARMACY_PAGE } from '../../content/vetPharmacyTerms';
 import { TERMS_PAGE } from '../../content/termsAndConditions';
 import { PRIVACY_PAGE } from '../../content/privacyPolicy';
@@ -15,6 +15,7 @@ const CONTENT_MAP = {
 };
 
 const StaticContentScreen = () => {
+  const styles = useThemedStyles(createStyles);
   const navigation = useNavigation();
   const route = useRoute();
   const contentKey = route.params?.contentKey || 'vetPharmacy';
@@ -26,7 +27,7 @@ const StaticContentScreen = () => {
       return;
     }
     if (target === 'chatDoctor') {
-      Alert.alert('Coming soon', 'Chat with a doctor will be available shortly.');
+      navigation.navigate('ChatDoctor');
       return;
     }
     if (target === 'terms') {
@@ -104,7 +105,7 @@ const StaticContentScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.background,

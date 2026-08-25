@@ -2,7 +2,8 @@ import React, { useCallback, useEffect } from 'react';
 import { Modal, View, StyleSheet, TouchableOpacity, BackHandler } from 'react-native';
 import AppText from '../AppText';
 import Button from '../Button';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const ConfirmDialog = ({
   visible,
@@ -15,6 +16,8 @@ const ConfirmDialog = ({
   onCancel,
   destructive = false,
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const handleClose = useCallback(() => {
     if (!loading) {
       onCancel?.();
@@ -61,7 +64,7 @@ const ConfirmDialog = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',

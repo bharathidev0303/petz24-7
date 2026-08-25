@@ -1,11 +1,11 @@
+import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import AppText from '../AppText';
-
-import { colors } from '../../styles/colors';
+import { useTheme } from '../../theme/ThemeContext';
 
 const TextButton = ({
   children,
-  color = colors.button,
+  color,
   fontWeight,
   fontFamily = 'Regular',
   fontSize,
@@ -13,12 +13,21 @@ const TextButton = ({
   onPress,
   style,
   ...props
-}) => (
-  <TouchableOpacity style={style} onPress={() => onPress?.()} {...props}>
-    <AppText color={color} fontWeight={fontWeight} fontFamily={fontFamily} fontSize={fontSize} letterSpacing={letterSpacing}>
-      {children}
-    </AppText>
-  </TouchableOpacity>
-);
+}) => {
+  const { colors } = useTheme();
+
+  return (
+    <TouchableOpacity style={style} onPress={() => onPress?.()} {...props}>
+      <AppText
+        color={color ?? colors.button}
+        fontWeight={fontWeight}
+        fontFamily={fontFamily}
+        fontSize={fontSize}
+        letterSpacing={letterSpacing}>
+        {children}
+      </AppText>
+    </TouchableOpacity>
+  );
+};
 
 export default TextButton;

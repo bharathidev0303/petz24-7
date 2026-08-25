@@ -3,9 +3,12 @@ import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-nat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from './AppText';
 import BackButton from './backButton';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const SubScreenHeader = ({ title, onBack, rightAction }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
@@ -43,7 +46,7 @@ const SubScreenHeader = ({ title, onBack, rightAction }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

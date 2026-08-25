@@ -34,4 +34,7 @@ export const ENDPOINTS = {
   GET_USER_PET_PLAN: '/get-user-pet-plan',
   ADD_BOOKING: '/add-booking',
   ADD_QUICK_BOOKING: '/add-quick-booking',
+  GET_USER_CHAT_SUBSCRIPTION: '/api/get-user-chat-subscription',
+  GET_CHAT_PLANS: '/get-chat-plans',
+  ADD_CHAT_BOOKING: '/add-chat-booking',
 };

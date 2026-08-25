@@ -13,12 +13,13 @@ import { useNavigation } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import CustomInput from '../../components/view/CustomInput';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { signup, clearError } from '../../redux/slices/authSlice';
 
 const logoSource = require('../../assets/app-logo.png');
 
 const SignupScreen = () => {
+  const styles = useThemedStyles(createStyles);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { loading, error } = useSelector(state => state.auth);
@@ -144,7 +145,7 @@ const SignupScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: '#F5F7FA',

@@ -11,11 +11,14 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
 import { homeAPI } from '../../api/home';
 
 const ShopScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const focusPetId = route.params?.focusPetId;
@@ -215,7 +218,7 @@ const ShopScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.background,

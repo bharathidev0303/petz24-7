@@ -1,7 +1,8 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import AppText from '../AppText';
 import { Fonts } from '../../utils/fontHelper';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const RadioOption = ({
   label,
@@ -13,24 +14,28 @@ const RadioOption = ({
   borderWidth = 1,
   borderRadius = 9,
   borderColor = '#909090',
-}) => (
-  <TouchableOpacity
-    disabled={disabled}
-    style={[styles.radioOption, disabled && styles.disabled]}
-    onPress={() => onSelect?.()}>
-    <View
-      style={[
-        styles.radio,
-        { width, height, borderWidth, borderRadius, borderColor },
-        selected && styles.radioSelected,
-      ]}>
-      {selected && <View style={styles.radioInner} />}
-    </View>
-    <AppText style={[styles.radioText, selected && styles.radioSelectedText]}>{label}</AppText>
-  </TouchableOpacity>
-);
+}) => {
+  const styles = useThemedStyles(createStyles);
 
-const styles = StyleSheet.create({
+  return (
+    <TouchableOpacity
+      disabled={disabled}
+      style={[styles.radioOption, disabled && styles.disabled]}
+      onPress={() => onSelect?.()}>
+      <View
+        style={[
+          styles.radio,
+          { width, height, borderWidth, borderRadius, borderColor },
+          selected && styles.radioSelected,
+        ]}>
+        {selected && <View style={styles.radioInner} />}
+      </View>
+      <AppText style={[styles.radioText, selected && styles.radioSelectedText]}>{label}</AppText>
+    </TouchableOpacity>
+  );
+};
+
+const createStyles = colors => ({
   radioOption: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.4 },
   radio: { alignItems: 'center', justifyContent: 'center' },

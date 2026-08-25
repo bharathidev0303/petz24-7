@@ -20,7 +20,8 @@ import CalendarModal, { parseCalendarDate } from './CalendarModal';
 import Close from '../icons/Close';
 import Upload from '../icons/Upload';
 import { AppToastService } from '../view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { petsAPI } from '../../api/pets';
 import { getUserPetImageUrl } from '../../config/env';
 
@@ -62,7 +63,10 @@ const computeAgeFromDob = dobStr => {
   };
 };
 
-const SelectField = ({ label, required, value, displayValue, placeholder, onPress, error }) => (
+const SelectField = ({ label, required, value, displayValue, placeholder, onPress, error }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <View style={styles.field}>
     <AppText style={styles.label}>
       {label}
@@ -79,9 +83,14 @@ const SelectField = ({ label, required, value, displayValue, placeholder, onPres
     </TouchableOpacity>
     {error ? <AppText style={styles.errorText}>{error}</AppText> : null}
   </View>
-);
+  );
+};
 
-const TextField = ({ label, value, onChangeText, placeholder, keyboardType, ...props }) => (
+const TextField = ({ label, value, onChangeText, placeholder, keyboardType, ...props }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <View style={styles.field}>
     <AppText style={styles.label}>{label}</AppText>
     <AppInput
@@ -94,9 +103,12 @@ const TextField = ({ label, value, onChangeText, placeholder, keyboardType, ...p
       {...props}
     />
   </View>
-);
+  );
+};
 
 const PetFormModal = ({ visible, mode = 'add', initialPet, userId, onClose, onSaved }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [form, setForm] = useState(EMPTY_FORM);
   const [petTypes, setPetTypes] = useState([]);
@@ -470,7 +482,7 @@ const PetFormModal = ({ visible, mode = 'add', initialPet, userId, onClose, onSa
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',

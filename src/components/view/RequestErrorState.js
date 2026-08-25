@@ -3,10 +3,11 @@ import { View, StyleSheet } from 'react-native';
 import AppText from '../AppText';
 import Button from './Button';
 import NoInternetView from './NoInternetView';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { getUserErrorMessage, isNoInternetMessage } from '../../utils/apiError';
 
 const RequestErrorState = ({ error, onRetry, fallbackMessage = 'Something went wrong. Please try again.' }) => {
+  const styles = useThemedStyles(createStyles);
   if (isNoInternetMessage(error)) {
     return <NoInternetView onRetry={onRetry} />;
   }
@@ -19,7 +20,7 @@ const RequestErrorState = ({ error, onRetry, fallbackMessage = 'Something went w
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     alignItems: 'center',

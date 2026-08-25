@@ -27,21 +27,29 @@ import {
 import { useSidebar } from '../../context/SidebarContext';
 import { useMoreMenuNavigation } from '../../hooks/useMoreMenuNavigation';
 import { logout } from '../../redux/slices/authSlice';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const logoSource = require('../../assets/app-logo.png');
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.78;
 
-const SidebarMenuItem = ({ label, icon: Icon, onPress, index, visible }) => (
+const SidebarMenuItem = ({ label, icon: Icon, onPress, index, visible }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <AnimatedMenuItem index={index} visible={visible} onPress={onPress} style={styles.menuItem}>
     <View style={styles.menuIconWrap}>
       <Icon width={20} height={20} color={colors.primary} />
     </View>
     <AppText style={styles.menuLabel}>{label}</AppText>
   </AnimatedMenuItem>
-);
+  );
+};
 
 const AppSidebar = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
   const { visible, closeSidebar } = useSidebar();
@@ -181,7 +189,7 @@ const AppSidebar = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   overlay: {
     flex: 1,
     flexDirection: 'row',

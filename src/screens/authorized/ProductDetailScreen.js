@@ -13,9 +13,10 @@ import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import ProductImageCarousel from '../../components/view/ProductImageCarousel';
-import { Heart } from '../../components/icons';
+import { Heart, VegNonVegIcon } from '../../components/icons';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
 import { productsAPI } from '../../api/products';
 import { cartAPI } from '../../api/cart';
@@ -35,6 +36,8 @@ const TABS = [
 const MAX_BOX_UNIT = 99;
 
 const ProductDetailScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -282,7 +285,7 @@ const ProductDetailScreen = () => {
 
         {details?.veg_nonveg ? (
           <View style={styles.badge}>
-            <AppText style={styles.badgeText}>{details.veg_nonveg}</AppText>
+            <VegNonVegIcon value={details.veg_nonveg} size={18} />
           </View>
         ) : null}
 
@@ -429,7 +432,7 @@ const ProductDetailScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   screen: {
     flex: 1,
     backgroundColor: colors.homeBody,
@@ -457,16 +460,13 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFF5ED',
-    paddingHorizontal: 10,
+    backgroundColor: colors.white,
+    paddingHorizontal: 6,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 6,
     marginBottom: 12,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   price: {
     fontSize: 26,

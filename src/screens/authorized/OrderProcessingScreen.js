@@ -5,9 +5,12 @@ import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import { Orders as OrdersIcon } from '../../components/icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const OrderProcessingScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const { orderNumber, orderId, message } = route.params || {};
@@ -63,7 +66,7 @@ const OrderProcessingScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

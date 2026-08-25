@@ -14,12 +14,15 @@ import AppText from '../../components/AppText';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import { useProductPreview } from '../../hooks/useProductPreview';
 import { AppToastService } from '../../components/view/AppToast';
-import { Heart, Close } from '../../components/icons';
-import { colors } from '../../styles/colors';
+import { Heart, Close, VegNonVegIcon } from '../../components/icons';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
 import { wishlistAPI } from '../../api/wishlist';
 
 const WishlistScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const { openPreview } = useProductPreview();
   const { user } = useSelector(state => state.auth);
@@ -104,7 +107,9 @@ const WishlistScreen = () => {
               {item.product_name}
             </AppText>
             {item.veg_nonveg ? (
-              <AppText style={styles.tag}>{item.veg_nonveg}</AppText>
+              <View style={styles.vegBadge}>
+                <VegNonVegIcon value={item.veg_nonveg} size={14} />
+              </View>
             ) : null}
           </View>
         </TouchableOpacity>
@@ -194,7 +199,7 @@ const WishlistScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -279,10 +284,13 @@ const styles = StyleSheet.create({
     color: colors.primaryText,
     marginBottom: 4,
   },
-  tag: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '600',
+  vegBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.white,
+    borderRadius: 4,
+    padding: 2,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   removeBtn: {
     width: 36,

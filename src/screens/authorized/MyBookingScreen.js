@@ -17,7 +17,8 @@ import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import RequestErrorState from '../../components/view/RequestErrorState';
 import { Calendar } from '../../components/icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { ordersAPI } from '../../api/orders';
 import { getAssetUrl } from '../../config/env';
 import { getUserErrorMessage } from '../../utils/apiError';
@@ -36,7 +37,7 @@ const EMPTY_MESSAGES = {
   chat: 'No chat bookings yet.',
 };
 
-const stageColor = stage => {
+const stageColor = (stage, colors) => {
   const value = String(stage || '').toLowerCase();
   if (value === 'done' || value === 'completed') return colors.success;
   if (value === 'cancelled' || value === 'canceled') return colors.error;
@@ -56,15 +57,25 @@ const parseBookingMeta = item => {
   }
 };
 
-const StageBadge = ({ stage }) => (
-  <View style={[styles.badge, { backgroundColor: `${stageColor(stage)}20` }]}>
-    <AppText style={[styles.badgeText, { color: stageColor(stage) }]}>
+const StageBadge = ({ stage }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+  const badgeColor = stageColor(stage, colors);
+
+  return (
+  <View style={[styles.badge, { backgroundColor: `${badgeColor}20` }]}>
+    <AppText style={[styles.badgeText, { color: badgeColor }]}>
       {formatStageLabel(stage)}
     </AppText>
   </View>
-);
+  );
+};
 
-const SlotBookingCard = ({ booking }) => (
+const SlotBookingCard = ({ booking }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <View style={styles.card}>
     <View style={styles.cardHeader}>
       <AppText style={styles.cardTitle}>{booking.plan_name || 'Slot Booking'}</AppText>
@@ -82,9 +93,12 @@ const SlotBookingCard = ({ booking }) => (
     </AppText>
     <AppText style={styles.bookingId}>Booking #{booking.booking_id}</AppText>
   </View>
-);
+  );
+};
 
 const QuickBookingCard = ({ booking }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const meta = parseBookingMeta(booking);
 
   return (
@@ -112,6 +126,7 @@ const QuickBookingCard = ({ booking }) => {
 };
 
 const ChatBookingCard = ({ booking }) => {
+  const styles = useThemedStyles(createStyles);
   const meta = parseBookingMeta(booking);
   const problemImage = booking.pet_problem_img
     ? getAssetUrl(
@@ -160,6 +175,9 @@ const getBookingId = (booking, tabId) => {
 };
 
 const BookingListPage = ({ tabId, data, refreshing, onRefresh, onBookingPress }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
   const renderItem = ({ item }) => {
     const card =
       tabId === 'quick' ? (
@@ -212,6 +230,8 @@ const BookingListPage = ({ tabId, data, refreshing, onRefresh, onBookingPress })
 };
 
 const MyBookingScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const pagerRef = useRef(null);
   const hasLoadedRef = useRef(false);
@@ -395,7 +415,7 @@ const MyBookingScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

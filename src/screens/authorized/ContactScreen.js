@@ -12,10 +12,15 @@ import { useNavigation } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import { ContactUs as ContactUsIcon, Phone, Mail } from '../../components/icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { supportAPI } from '../../api/support';
 
-const ContactRow = ({ icon: Icon, label, value, onPress }) => (
+const ContactRow = ({ icon: Icon, label, value, onPress }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <TouchableOpacity
     activeOpacity={0.85}
     style={styles.contactRow}
@@ -29,7 +34,8 @@ const ContactRow = ({ icon: Icon, label, value, onPress }) => (
       <AppText style={styles.contactValue}>{value}</AppText>
     </View>
   </TouchableOpacity>
-);
+  );
+};
 
 const parseSupportDetails = response => ({
   phone: response?.support_contact || response?.data?.support_contact || '',
@@ -37,6 +43,8 @@ const parseSupportDetails = response => ({
 });
 
 const ContactScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -134,7 +142,7 @@ const ContactScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

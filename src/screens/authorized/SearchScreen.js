@@ -19,9 +19,10 @@ import Button from '../../components/Button';
 import ScreenLayout from '../../components/view/ScreenLayout';
 import PriceRangeSlider from '../../components/view/PriceRangeSlider';
 import { useProductPreview } from '../../hooks/useProductPreview';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
-import { Close } from '../../components/icons';
+import { Close, VegNonVegIcon } from '../../components/icons';
 import { productsAPI } from '../../api/products';
 import { TAB_BAR_STYLE } from '../../navigation/tabBarConfig';
 
@@ -57,6 +58,8 @@ const getVegOptions = vegCounts =>
   }));
 
 const SearchScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -668,14 +671,21 @@ const SearchScreen = () => {
       activeOpacity={0.85}
       onPress={() => openPreview(item)}
       style={styles.resultCard}>
-      {item.url || item.product_image ? (
-        <Image
-          source={{ uri: getAssetUrl(item.url || item.product_image) }}
-          style={styles.resultImage}
-        />
-      ) : (
-        <View style={[styles.resultImage, styles.imagePlaceholder]} />
-      )}
+      <View style={styles.imageWrap}>
+        {item.url || item.product_image ? (
+          <Image
+            source={{ uri: getAssetUrl(item.url || item.product_image) }}
+            style={styles.resultImage}
+          />
+        ) : (
+          <View style={[styles.resultImage, styles.imagePlaceholder]} />
+        )}
+        {item.veg_nonveg ? (
+          <View style={styles.vegIconWrap}>
+            <VegNonVegIcon value={item.veg_nonveg} size={12} />
+          </View>
+        ) : null}
+      </View>
       <View style={styles.resultInfo}>
         <AppText style={styles.brand}>{item.brand_name}</AppText>
         <AppText style={styles.name} numberOfLines={2}>
@@ -834,7 +844,7 @@ const SearchScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   collectionMetaRow: {
     paddingHorizontal: 16,
     paddingTop: 12,
@@ -1053,6 +1063,17 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 8,
     backgroundColor: colors.lightGray,
+  },
+  imageWrap: {
+    position: 'relative',
+  },
+  vegIconWrap: {
+    position: 'absolute',
+    bottom: 4,
+    left: 4,
+    backgroundColor: colors.white,
+    borderRadius: 3,
+    padding: 2,
   },
   imagePlaceholder: {
     backgroundColor: '#e8e8e8',

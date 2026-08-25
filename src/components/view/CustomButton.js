@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { TouchableOpacity, StyleSheet, Animated, ActivityIndicator } from 'react-native';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import AppText from './AppText';
 
 const CustomButton = ({
@@ -10,6 +11,8 @@ const CustomButton = ({
   disabled,
   variant = 'primary',
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const isPrimary = variant === 'primary';
 
@@ -18,6 +21,7 @@ const CustomButton = ({
       <TouchableOpacity
         style={[
           styles.button,
+          { borderRadius: colors.buttonRadius },
           isPrimary ? styles.primaryButton : styles.secondaryButton,
           disabled && styles.disabledButton,
         ]}
@@ -29,19 +33,22 @@ const CustomButton = ({
         disabled={disabled || loading}
         activeOpacity={0.8}>
         {loading ? (
-          <ActivityIndicator color={isPrimary ? colors.white : colors.primary} />
+          <ActivityIndicator color={isPrimary ? colors.buttonText : colors.primary} />
         ) : (
-          <AppText style={[styles.text, isPrimary ? styles.primaryText : styles.secondaryText]}>{title}</AppText>
+          <AppText
+            color={isPrimary ? colors.buttonText : colors.text}
+            style={[styles.text, !isPrimary && styles.secondaryText]}>
+            {title}
+          </AppText>
         )}
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   button: {
     height: 56,
-    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 8,
@@ -50,7 +57,6 @@ const styles = StyleSheet.create({
   secondaryButton: { backgroundColor: colors.lightGray, borderWidth: 1, borderColor: colors.border },
   disabledButton: { backgroundColor: colors.loginButtonBackgroundColor },
   text: { fontSize: 18, fontWeight: '600' },
-  primaryText: { color: colors.white },
   secondaryText: { color: colors.text },
 });
 

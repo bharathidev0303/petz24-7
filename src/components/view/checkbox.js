@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import AppText from '../AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 export default function CustomCheckbox({
   title = '',
@@ -10,7 +11,7 @@ export default function CustomCheckbox({
   containerStyle,
   checkboxStyle,
   textStyle,
-  activeColor = colors.primary,
+  activeColor,
   inactiveColor = '#C7C7CC',
   disabled = false,
   disabledColor = '#E5E5E5',
@@ -18,6 +19,9 @@ export default function CustomCheckbox({
   borderWidth = 2,
   checkIcon = '✓',
 }) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+  const resolvedActiveColor = activeColor ?? colors.primary;
   const [internalChecked, setInternalChecked] = useState(false);
   const checked = controlledChecked ?? internalChecked;
 
@@ -33,7 +37,7 @@ export default function CustomCheckbox({
       Animated.spring(iconScale, { toValue: checked ? 1 : 0, friction: 6, useNativeDriver: true }),
       Animated.timing(iconOpacity, { toValue: checked ? 1 : 0, duration: 120, useNativeDriver: true }),
     ]).start();
-  }, [checked]);
+  }, [checked, bgOpacity, bgScale, iconOpacity, iconScale]);
 
   const handlePress = () => {
     if (disabled) return;
@@ -56,7 +60,11 @@ export default function CustomCheckbox({
             height: size,
             borderRadius: size / 4,
             borderWidth,
-            borderColor: disabled ? disabledColor : checked ? activeColor : inactiveColor,
+            borderColor: disabled
+              ? disabledColor
+              : checked
+                ? resolvedActiveColor
+                : inactiveColor,
           },
           checkboxStyle,
         ]}>
@@ -64,7 +72,11 @@ export default function CustomCheckbox({
           pointerEvents="none"
           style={[
             StyleSheet.absoluteFillObject,
-            { backgroundColor: activeColor, opacity: bgOpacity, transform: [{ scale: bgScale }] },
+            {
+              backgroundColor: resolvedActiveColor,
+              opacity: bgOpacity,
+              transform: [{ scale: bgScale }],
+            },
           ]}
         />
         <Animated.View style={{ opacity: iconOpacity, transform: [{ scale: iconScale }] }}>
@@ -81,9 +93,9 @@ export default function CustomCheckbox({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: { flexDirection: 'row', alignItems: 'center' },
   checkbox: { justifyContent: 'center', alignItems: 'center', marginRight: 8, overflow: 'hidden' },
   checkMark: { color: '#fff', fontWeight: '600' },
-  label: { fontSize: 16, color: '#333' },
+  label: { fontSize: 16, color: colors.primaryText },
 });

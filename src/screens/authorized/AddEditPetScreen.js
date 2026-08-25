@@ -20,7 +20,8 @@ import DropdownModal from '../../components/modals/dropdownModel';
 import CalendarModal, { parseCalendarDate } from '../../components/modals/CalendarModal';
 import Upload from '../../components/icons/Upload';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { petsAPI } from '../../api/pets';
 import { getUserPetImageUrl } from '../../config/env';
 import { getUserErrorMessage } from '../../utils/apiError';
@@ -63,7 +64,10 @@ const computeAgeFromDob = dobStr => {
   };
 };
 
-const SelectField = ({ label, required, value, displayValue, placeholder, onPress, error }) => (
+const SelectField = ({ label, required, value, displayValue, placeholder, onPress, error }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <View style={styles.field}>
     <AppText style={styles.label}>
       {label}
@@ -80,9 +84,14 @@ const SelectField = ({ label, required, value, displayValue, placeholder, onPres
     </TouchableOpacity>
     {error ? <AppText style={styles.errorText}>{error}</AppText> : null}
   </View>
-);
+  );
+};
 
-const TextField = ({ label, value, onChangeText, placeholder, keyboardType, ...props }) => (
+const TextField = ({ label, value, onChangeText, placeholder, keyboardType, ...props }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <View style={styles.field}>
     <AppText style={styles.label}>{label}</AppText>
     <AppInput
@@ -95,9 +104,12 @@ const TextField = ({ label, value, onChangeText, placeholder, keyboardType, ...p
       {...props}
     />
   </View>
-);
+  );
+};
 
 const AddEditPetScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = useSelector(state => state.auth);
@@ -430,7 +442,7 @@ const AddEditPetScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

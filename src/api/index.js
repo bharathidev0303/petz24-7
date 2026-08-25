@@ -10,3 +10,4 @@ export { ordersAPI } from './orders';
 export { supportAPI } from './support';
 export { petsAPI } from './pets';
 export { bookingAPI } from './booking';
+export { chatAPI } from './chat';

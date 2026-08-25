@@ -3,19 +3,26 @@ import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { ordersAPI } from '../../api/orders';
 
 const orderItemsCache = new Map();
 
-const InfoRow = ({ label, value }) => (
+const InfoRow = ({ label, value }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <View style={styles.infoRow}>
     <AppText style={styles.infoLabel}>{label}</AppText>
     <AppText style={styles.infoValue}>{value || '-'}</AppText>
   </View>
-);
+  );
+};
 
 const OrderDetailScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const order = route.params?.order;
@@ -155,7 +162,7 @@ const OrderDetailScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

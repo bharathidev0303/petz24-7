@@ -3,7 +3,8 @@ import { View, Animated, StyleSheet } from 'react-native';
 import AppText from '../AppText';
 import AppInput from '../AppInput';
 import AppView from '../AppView';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const FloatingInput = ({
   label,
@@ -22,6 +23,8 @@ const FloatingInput = ({
   onChangeText,
   ...props
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const hasFocusedOnce = useRef(false);
   const isFirstRender = useRef(true);
@@ -108,7 +111,7 @@ const FloatingInput = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     borderWidth: 1.5,
     borderColor: '#E3E3E3',

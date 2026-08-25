@@ -7,10 +7,13 @@ import Button from '../../components/Button';
 import ScreenLayout from '../../components/view/ScreenLayout';
 import AnimatedMenuItem from '../../components/view/AnimatedMenuItem';
 import { MENU_ITEMS } from '../../constants/menuItems';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { logout } from '../../redux/slices/authSlice';
 
 const MenuScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [animateItems, setAnimateItems] = useState(false);
@@ -74,7 +77,7 @@ const MenuScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   content: {
     padding: 16,
     paddingBottom: 40,

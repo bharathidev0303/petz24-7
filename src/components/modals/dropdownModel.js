@@ -9,7 +9,8 @@ import {
   FlatList,
 } from 'react-native';
 import AppText from '../AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import Close from '../icons/Close';
 import Search from '../icons/Search';
 
@@ -29,6 +30,8 @@ const DropdownModal = ({
   emptyText = 'No items available',
   onApply,
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const handleMultiToggle = key => {
     let updated;
     if (selectedIds.includes(key)) {
@@ -114,7 +117,7 @@ const DropdownModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
     backgroundColor: '#fff',

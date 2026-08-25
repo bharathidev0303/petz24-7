@@ -9,7 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import AppText from '../AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import Close from '../icons/Close';
 import Search from '../icons/Search';
 
@@ -24,6 +25,8 @@ const SearchableDropdownModal = ({
   onSearch,
   onAddNew,
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
@@ -104,7 +107,7 @@ const SearchableDropdownModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   backdrop: { flex: 1 },
   modalContent: {

@@ -20,8 +20,7 @@ export const useMoreMenuNavigation = onClose => {
     goPet: petId => run(() => navigateInMainApp('Shop', { focusPetId: String(petId) })),
     goBrands: () => run(() => navigateInMainApp('Shop', { focusSection: 'brands' })),
     goConsultation: () => run(() => navigateInMainApp('Booking')),
-    goChatDoctor: () =>
-      run(() => Alert.alert('Coming soon', 'Chat with a doctor will be available shortly.')),
+    goChatDoctor: () => run(() => navigateInMainApp('ChatDoctor')),
     goProfile: () => run(() => navigateInMainApp('Profile')),
     goOrders: () => run(() => navigateToTab('Orders')),
     goMyBooking: () => run(() => navigateInMainApp('MyBooking')),

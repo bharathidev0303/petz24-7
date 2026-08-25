@@ -16,7 +16,8 @@ import { useProductPreview } from '../../hooks/useProductPreview';
 import { AppToastService } from '../../components/view/AppToast';
 import { Cart as CartIcon, Close } from '../../components/icons';
 import Button from '../../components/Button';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
 import { cartAPI } from '../../api/cart';
 
@@ -27,6 +28,8 @@ const getLineTotal = item => {
 };
 
 const CartScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const { openPreview } = useProductPreview();
   const { user } = useSelector(state => state.auth);
@@ -246,7 +249,7 @@ const CartScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   centered: {
     flex: 1,
     alignItems: 'center',

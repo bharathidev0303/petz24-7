@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import AppHeader from './AppHeader';
 import { useSidebar } from '../../context/SidebarContext';
 import { useMenuSheet } from '../../context/MenuSheetContext';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const ScreenLayout = ({
   children,
@@ -25,6 +25,7 @@ const ScreenLayout = ({
   onFilterPress,
   filterActive = false,
 }) => {
+  const styles = useThemedStyles(createStyles);
   const { openSidebar } = useSidebar();
   const { closeMenuSheet } = useMenuSheet();
 
@@ -63,7 +64,7 @@ const ScreenLayout = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

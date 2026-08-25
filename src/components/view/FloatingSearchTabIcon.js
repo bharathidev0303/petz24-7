@@ -1,13 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Search } from '../icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const CIRCLE_SIZE = 58;
 const ICON_SIZE = 28;
 const LIFT = 30;
 
 const FloatingSearchTabIcon = ({ focused }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -33,7 +36,7 @@ const FloatingSearchTabIcon = ({ focused }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   wrapper: {
     alignItems: 'center',
     justifyContent: 'center',

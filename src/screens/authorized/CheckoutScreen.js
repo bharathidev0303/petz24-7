@@ -13,11 +13,14 @@ import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import AddressCard from '../../components/view/AddressCard';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { addressAPI } from '../../api/address';
 import { ordersAPI } from '../../api/orders';
 
 const CheckoutScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const orderType = route.params?.orderType || 'cart';
@@ -165,7 +168,7 @@ const CheckoutScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

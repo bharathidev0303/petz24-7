@@ -16,7 +16,8 @@ import ListCardActions from '../../components/view/ListCardActions';
 import ConfirmDialog from '../../components/modals/ConfirmDialog';
 import RequestErrorState from '../../components/view/RequestErrorState';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { petsAPI } from '../../api/pets';
 import { getUserPetImageUrl } from '../../config/env';
 import { getUserErrorMessage } from '../../utils/apiError';
@@ -29,6 +30,8 @@ const formatAge = pet => {
 };
 
 const PetCard = ({ pet, onEdit, onDelete }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const imageUri = getUserPetImageUrl(pet.pet_img);
   const ageText = formatAge(pet);
 
@@ -65,6 +68,8 @@ const PetCard = ({ pet, onEdit, onDelete }) => {
 };
 
 const ManagePetScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const hasLoadedRef = useRef(false);
   const { user } = useSelector(state => state.auth);
@@ -212,7 +217,7 @@ const ManagePetScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

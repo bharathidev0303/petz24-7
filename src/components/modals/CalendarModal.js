@@ -9,7 +9,7 @@ import {
 import AppText from '../AppText';
 import Button from '../Button';
 import Close from '../icons/Close';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = [
@@ -63,6 +63,7 @@ const CalendarModal = ({
   onSelect,
   maximumDate = new Date(),
 }) => {
+  const styles = useThemedStyles(createStyles);
   const parsedValue = parseCalendarDate(value);
   const maxDay = startOfDay(maximumDate);
 
@@ -247,7 +248,7 @@ const CalendarModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',

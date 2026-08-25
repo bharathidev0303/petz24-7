@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import AppText from './AppText';
 import ListCardActions from './ListCardActions';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { formatAddressLines, formatAddressName } from '../../utils/address';
 
 const AddressCard = ({
@@ -13,6 +13,7 @@ const AddressCard = ({
   onDelete,
   showActions = false,
 }) => {
+  const styles = useThemedStyles(createStyles);
   const Wrapper = onPress ? TouchableOpacity : View;
   const wrapperProps = onPress
     ? { activeOpacity: 0.85, onPress, style: [styles.card, selected && styles.cardSelected] }
@@ -33,7 +34,7 @@ const AddressCard = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   card: {
     backgroundColor: colors.white,
     borderRadius: 14,

@@ -13,7 +13,8 @@ import {
 import { TAB_BAR_HEIGHT_COMPACT } from '../../navigation/tabBarConfig';
 import AppText from '../AppText';
 import { Shop } from '../icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { useMenuSheet } from '../../context/MenuSheetContext';
 import { useMoreMenuNavigation } from '../../hooks/useMoreMenuNavigation';
 import { homeAPI } from '../../api/home';
@@ -28,7 +29,11 @@ const SHEET_PADDING = 32;
 const STATIC_SECTION_HEIGHT = HANDLE_HEIGHT + STATIC_ROW_HEIGHT + SHEET_PADDING;
 const DYNAMIC_MAX_HEIGHT = MAX_SHEET_HEIGHT - STATIC_SECTION_HEIGHT;
 
-const MenuSheetItem = ({ label, imageUri, Icon, onPress }) => (
+const MenuSheetItem = ({ label, imageUri, Icon, onPress }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <TouchableOpacity activeOpacity={0.85} style={styles.item} onPress={onPress}>
     <View style={styles.iconCircle}>
       {imageUri ? (
@@ -43,7 +48,8 @@ const MenuSheetItem = ({ label, imageUri, Icon, onPress }) => (
       {label}
     </AppText>
   </TouchableOpacity>
-);
+  );
+};
 
 const chunkItems = (items, size) => {
   const rows = [];
@@ -54,6 +60,7 @@ const chunkItems = (items, size) => {
 };
 
 const MenuBottomSheet = () => {
+  const styles = useThemedStyles(createStyles);
   const { visible, closeMenuSheet } = useMenuSheet();
   const menuNav = useMoreMenuNavigation(closeMenuSheet);
   const tabBarHeight = TAB_BAR_HEIGHT_COMPACT;
@@ -267,7 +274,7 @@ const MenuBottomSheet = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   root: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 100,

@@ -10,15 +10,17 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import BookingStepIndicator from '../../components/view/BookingStepIndicator';
+import BookingPetSelector from '../../components/view/BookingPetSelector';
 import { BackArrow, Calendar, Document, Doctor, Paw, Plan } from '../../components/icons';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { petsAPI } from '../../api/pets';
 import {
   bookingAPI,
@@ -28,7 +30,7 @@ import {
   normalizeTimeSlots,
 } from '../../api/booking';
 import { supportAPI } from '../../api/support';
-import { getAssetUrl, getUserPetImageUrl } from '../../config/env';
+import { getAssetUrl } from '../../config/env';
 import { getUserErrorMessage } from '../../utils/apiError';
 import {
   buildSlotInfo,
@@ -86,23 +88,32 @@ const parseSupportDetails = response => ({
   email: response?.support_email || response?.data?.support_email || 'petz247@gmail.com',
 });
 
-const SectionTitle = ({ title, subtitle }) => (
+const SectionTitle = ({ title, subtitle }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <View style={styles.sectionHeader}>
     <AppText style={styles.sectionTitle}>{title}</AppText>
     {subtitle ? <AppText style={styles.sectionSubtitle}>{subtitle}</AppText> : null}
   </View>
-);
+  );
+};
 
-const SelectableCard = ({ selected, onPress, children, style }) => (
+const SelectableCard = ({ selected, onPress, children, style }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <TouchableOpacity
     activeOpacity={0.85}
     onPress={onPress}
     style={[styles.selectCard, selected && styles.selectCardActive, style]}>
     {children}
   </TouchableOpacity>
-);
+  );
+};
 
 const ReviewRow = ({ label, value }) => {
+  const styles = useThemedStyles(createStyles);
   if (!value) return null;
   return (
     <View style={styles.reviewRow}>
@@ -113,6 +124,8 @@ const ReviewRow = ({ label, value }) => {
 };
 
 const DoctorBookingScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const { user } = useSelector(state => state.auth);
 
@@ -250,6 +263,12 @@ const DoctorBookingScreen = () => {
     loadLanguages();
   }, [loadPets, loadLanguages]);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadPets();
+    }, [loadPets]),
+  );
+
   useEffect(() => {
     if (step === 3) {
       loadSlots(selectedDate);
@@ -385,47 +404,14 @@ const DoctorBookingScreen = () => {
   };
 
   const renderStepOne = () => (
-    <View>
-      <SectionTitle
-        title="Please select the pet for consultation:"
-        subtitle="Choose one pet to continue with doctor booking."
-      />
-      {loadingPets ? (
-        <ActivityIndicator color={colors.primary} style={styles.loader} />
-      ) : pets.length ? (
-        pets.map(pet => {
-          const selected = selectedPet?.user_pety_id === pet.user_pety_id;
-          const imageUri = getUserPetImageUrl(pet.pet_img);
-          return (
-            <SelectableCard
-              key={pet.user_pety_id}
-              selected={selected}
-              onPress={() => setSelectedPet(pet)}>
-              <View style={styles.petRow}>
-                {imageUri ? (
-                  <Image source={{ uri: imageUri }} style={styles.petImage} />
-                ) : (
-                  <View style={[styles.petImage, styles.petImagePlaceholder]}>
-                    <AppText style={styles.petInitial}>{(pet.name || '?').charAt(0)}</AppText>
-                  </View>
-                )}
-                <View style={styles.petInfo}>
-                  <AppText style={styles.cardTitle}>{pet.name || 'Unnamed Pet'}</AppText>
-                  <AppText style={styles.cardMeta}>{pet.pet_name || '—'}</AppText>
-                  {pet.breed_name ? <AppText style={styles.cardMeta}>{pet.breed_name}</AppText> : null}
-                </View>
-                <View style={[styles.radio, selected && styles.radioSelected]} />
-              </View>
-            </SelectableCard>
-          );
-        })
-      ) : (
-        <View style={styles.emptyWrap}>
-          <AppText style={styles.emptyText}>You have not added any pets yet.</AppText>
-          <Button onPress={() => navigation.navigate('AddEditPet')}>Add Pet</Button>
-        </View>
-      )}
-    </View>
+    <BookingPetSelector
+      subtitle="Choose one pet to continue with doctor booking."
+      pets={pets}
+      loading={loadingPets}
+      selectedPet={selectedPet}
+      onSelectPet={setSelectedPet}
+      onAddPet={() => navigation.navigate('AddEditPet')}
+    />
   );
 
   const renderStepTwo = () => (
@@ -728,7 +714,7 @@ const DoctorBookingScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

@@ -18,7 +18,8 @@ import SubScreenHeader from '../../components/view/SubScreenHeader';
 import BookingStepIndicator from '../../components/view/BookingStepIndicator';
 import { BackArrow, Document, Phone } from '../../components/icons';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import {
   bookingAPI,
   normalizeDoctorLanguages,
@@ -82,23 +83,32 @@ const parseSupportDetails = response => ({
   email: response?.support_email || response?.data?.support_email || 'petz247@gmail.com',
 });
 
-const SectionTitle = ({ title, subtitle }) => (
+const SectionTitle = ({ title, subtitle }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <View style={styles.sectionHeader}>
     <AppText style={styles.sectionTitle}>{title}</AppText>
     {subtitle ? <AppText style={styles.sectionSubtitle}>{subtitle}</AppText> : null}
   </View>
-);
+  );
+};
 
-const SelectableCard = ({ selected, onPress, children }) => (
+const SelectableCard = ({ selected, onPress, children }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <TouchableOpacity
     activeOpacity={0.85}
     onPress={onPress}
     style={[styles.selectCard, selected && styles.selectCardActive]}>
     {children}
   </TouchableOpacity>
-);
+  );
+};
 
 const ReviewRow = ({ label, value }) => {
+  const styles = useThemedStyles(createStyles);
   if (!value) return null;
   return (
     <View style={styles.reviewRow}>
@@ -109,6 +119,8 @@ const ReviewRow = ({ label, value }) => {
 };
 
 const QuickBookingScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const { user } = useSelector(state => state.auth);
 
@@ -459,7 +471,7 @@ const QuickBookingScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

@@ -4,12 +4,15 @@ import { useNavigation } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const doctorImage = require('../../assets/booking-doctor.png');
 const quickImage = require('../../assets/booking-quick.png');
 
-const BookingCard = ({ image, title, description, buttonLabel, onPress }) => (
+const BookingCard = ({ image, title, description, buttonLabel, onPress }) => {
+  const styles = useThemedStyles(createStyles);
+
+  return (
   <View style={styles.card}>
     <View style={styles.imageWrap}>
       <Image source={image} style={styles.image} resizeMode="contain" />
@@ -20,9 +23,11 @@ const BookingCard = ({ image, title, description, buttonLabel, onPress }) => (
       {buttonLabel}
     </Button>
   </View>
-);
+  );
+};
 
 const BookingScreen = () => {
+  const styles = useThemedStyles(createStyles);
   const navigation = useNavigation();
 
   const handleDoctorBooking = () => {
@@ -60,7 +65,7 @@ const BookingScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

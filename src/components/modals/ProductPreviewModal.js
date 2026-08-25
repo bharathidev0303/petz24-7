@@ -11,8 +11,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../view/AppText';
 import Button from '../view/Button';
-import { Close } from '../icons';
-import { colors } from '../../styles/colors';
+import { Close, VegNonVegIcon } from '../icons';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
 import { productsAPI } from '../../api/products';
 import { cartAPI } from '../../api/cart';
@@ -24,6 +25,8 @@ import {
 } from '../../utils/productQuantity';
 
 const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -160,7 +163,7 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
 
             {details?.veg_nonveg ? (
               <View style={styles.badge}>
-                <AppText style={styles.badgeText}>{details.veg_nonveg}</AppText>
+                <VegNonVegIcon value={details.veg_nonveg} size={18} />
               </View>
             ) : null}
 
@@ -231,7 +234,7 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -308,16 +311,13 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FFF5ED',
-    paddingHorizontal: 10,
+    backgroundColor: colors.white,
+    paddingHorizontal: 6,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 6,
     marginBottom: 12,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   qtySection: {
     marginBottom: 12,

@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet, Dimensions, Image } from 'react-native';
 import AppText from './AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const { width } = Dimensions.get('window');
 const logoSource = require('../../assets/app-logo.png');
 
 export default function SplashScreen({ onFinish }) {
+  const styles = useThemedStyles(createStyles);
   const logoFade = useRef(new Animated.Value(0)).current;
   const logoScale = useRef(new Animated.Value(0.85)).current;
   const welcomeFade = useRef(new Animated.Value(0)).current;
@@ -54,7 +55,7 @@ export default function SplashScreen({ onFinish }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.white,

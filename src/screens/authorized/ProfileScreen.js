@@ -6,10 +6,11 @@ import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import { Profile as ProfileIcon } from '../../components/icons';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { logout } from '../../redux/slices/authSlice';
 
-const MenuRow = ({ label, onPress, isLast = false }) => (
+const MenuRow = ({ label, onPress, isLast = false, styles }) => (
   <TouchableOpacity
     activeOpacity={0.7}
     onPress={onPress}
@@ -20,6 +21,8 @@ const MenuRow = ({ label, onPress, isLast = false }) => (
 );
 
 const ProfileScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { user } = useSelector(state => state.auth);
@@ -44,16 +47,24 @@ const ProfileScreen = () => {
         <View style={styles.infoCard}>
           <AppText style={styles.label}>Account</AppText>
           <MenuRow
+            label="Appearance"
+            onPress={() => navigation.navigate('Appearance')}
+            styles={styles}
+          />
+          <MenuRow
             label="Manage Address"
             onPress={() => navigation.navigate('AddressList')}
+            styles={styles}
           />
           <MenuRow
             label="Manage Pet"
             onPress={() => navigation.navigate('ManagePet')}
+            styles={styles}
           />
           <MenuRow
             label="Contact Us"
             onPress={() => navigation.navigate('Contact')}
+            styles={styles}
             isLast
           />
         </View>
@@ -69,7 +80,7 @@ const ProfileScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -82,7 +93,7 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: '#FFF5ED',
+    backgroundColor: colors.avatarBackground,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -102,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   infoCard: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,

@@ -11,7 +11,8 @@ import { useSelector } from 'react-redux';
 import AppText from '../../components/AppText';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import RequestErrorState from '../../components/view/RequestErrorState';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { ordersAPI } from '../../api/orders';
 import { getAssetUrl } from '../../config/env';
 import { getUserErrorMessage } from '../../utils/apiError';
@@ -22,7 +23,7 @@ const BOOKING_TITLES = {
   chat: 'Chat Booking Details',
 };
 
-const stageColor = stage => {
+const stageColor = (stage, colors) => {
   const value = String(stage || '').toLowerCase();
   if (value === 'done' || value === 'completed') return colors.success;
   if (value === 'cancelled' || value === 'canceled') return colors.error;
@@ -49,6 +50,8 @@ const formatValue = value => {
 };
 
 const InfoRow = ({ label, value }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const formatted = formatValue(value);
   if (!formatted) return null;
 
@@ -134,6 +137,8 @@ const normalizeBookingInfo = (response, bookingType) => {
 };
 
 const BookingDetailScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = useSelector(state => state.auth);
@@ -178,7 +183,7 @@ const BookingDetailScreen = () => {
   }, [preview, detail, bookingType]);
 
   const content = detail || fallbackDetail;
-  const statusColor = stageColor(content?.stage);
+  const statusColor = stageColor(content?.stage, colors);
 
   if (!bookingId || !bookingType) {
     return (
@@ -244,7 +249,7 @@ const BookingDetailScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

@@ -1,21 +1,25 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import AppText from '../AppText';
 import Button from './Button';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 import { APP_ERROR_MESSAGES, APP_ERROR_CODES } from '../../utils/apiError';
 
-const NoInternetView = ({ onRetry, compact = false }) => (
-  <View style={[styles.container, compact && styles.compact]}>
-    <AppText style={styles.title}>No internet connection</AppText>
-    <AppText style={styles.subtitle}>
-      {APP_ERROR_MESSAGES[APP_ERROR_CODES.NO_INTERNET]}
-    </AppText>
-    {onRetry ? <Button onPress={onRetry}>Try again</Button> : null}
-  </View>
-);
+const NoInternetView = ({ onRetry, compact = false }) => {
+  const styles = useThemedStyles(createStyles);
 
-const styles = StyleSheet.create({
+  return (
+    <View style={[styles.container, compact && styles.compact]}>
+      <AppText style={styles.title}>No internet connection</AppText>
+      <AppText style={styles.subtitle}>
+        {APP_ERROR_MESSAGES[APP_ERROR_CODES.NO_INTERNET]}
+      </AppText>
+      {onRetry ? <Button onPress={onRetry}>Try again</Button> : null}
+    </View>
+  );
+};
+
+const createStyles = colors => ({
   container: {
     flex: 1,
     alignItems: 'center',

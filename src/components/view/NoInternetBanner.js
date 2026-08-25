@@ -3,9 +3,10 @@ import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppText from '../AppText';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const NoInternetBanner = () => {
+  const styles = useThemedStyles(createStyles);
   const insets = useSafeAreaInsets();
   const { isOffline } = useNetworkStatus();
 
@@ -21,7 +22,7 @@ const NoInternetBanner = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     position: 'absolute',
     top: 0,

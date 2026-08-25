@@ -15,12 +15,15 @@ import AddressCard from '../../components/view/AddressCard';
 import ConfirmDialog from '../../components/modals/ConfirmDialog';
 import RequestErrorState from '../../components/view/RequestErrorState';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { addressAPI } from '../../api/address';
 import { getUserErrorMessage } from '../../utils/apiError';
 import { formatAddressName } from '../../utils/address';
 
 const AddressListScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const hasLoadedRef = useRef(false);
   const { user } = useSelector(state => state.auth);
@@ -166,7 +169,7 @@ const AddressListScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

@@ -12,12 +12,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import AppText from '../../components/AppText';
 import Button from '../../components/Button';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { login, clearError } from '../../redux/slices/authSlice';
 
 const logoSource = require('../../assets/app-logo.png');
 
 const LoginScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { loading, error } = useSelector(state => state.auth);
@@ -72,7 +75,7 @@ const LoginScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: '#F5F7FA',

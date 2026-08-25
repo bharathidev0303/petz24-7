@@ -2,9 +2,12 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
 import AppText from './AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const PriceRangeSlider = ({ min, max, low, high, onLowChange, onHighChange }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   if (min == null || max == null || min >= max) {
     return null;
   }
@@ -44,7 +47,7 @@ const PriceRangeSlider = ({ min, max, low, high, onLowChange, onHighChange }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     marginBottom: 8,
   },

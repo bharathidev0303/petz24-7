@@ -4,7 +4,8 @@ import AppText from '../AppText';
 import AppView from '../AppView';
 import Downarrow from '../icons/downArrow';
 import SearchableDropdownModal from '../modals/SearchableDropdownModal';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const FloatingDropdown = ({
   label,
@@ -22,6 +23,8 @@ const FloatingDropdown = ({
   onPress,
   rightIcon = true,
 }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const isFirstRender = useRef(true);
   const [isFocused, setIsFocused] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -98,7 +101,7 @@ const FloatingDropdown = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     borderWidth: 1.5,
     borderColor: '#E3E3E3',

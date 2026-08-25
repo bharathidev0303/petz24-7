@@ -6,12 +6,13 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const HORIZONTAL_PADDING = 32;
 const carouselWidth = Dimensions.get('window').width - HORIZONTAL_PADDING;
 
 const ProductImageCarousel = ({ images = [] }) => {
+  const styles = useThemedStyles(createStyles);
   const [activeIndex, setActiveIndex] = useState(0);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
 
@@ -77,7 +78,7 @@ const ProductImageCarousel = ({ images = [] }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   wrap: {
     marginBottom: 16,
   },

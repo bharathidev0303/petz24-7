@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthStack from './stacks/AuthStack';
@@ -11,20 +11,39 @@ import { SidebarProvider } from '../context/SidebarContext';
 import { MenuSheetProvider } from '../context/MenuSheetContext';
 import { mainStackRef } from './navigateFromSidebar';
 import { checkAuthStatus } from '../redux/slices/authSlice';
-import { colors } from '../styles/colors';
+import { useThemedStyles } from '../theme/useThemedStyles';
+import { useTheme } from '../theme/ThemeContext';
 
 const Stack = createStackNavigator();
 
-const LoadingScreen = () => (
-  <View style={styles.loading}>
-    <ActivityIndicator size="large" color={colors.primary} />
-  </View>
-);
+const LoadingScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
+    <View style={styles.loading}>
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
+  );
+};
 
 const AppNavigator = () => {
   const dispatch = useDispatch();
   const { isAuthenticated, authInitialized, loading } = useSelector(state => state.auth);
+  const { colors, isDark } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
+
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.card,
+      text: colors.primaryText,
+      border: colors.border,
+    },
+  };
 
   useEffect(() => {
     if (!authInitialized) {
@@ -42,7 +61,7 @@ const AppNavigator = () => {
 
   return (
     <>
-      <NavigationContainer ref={mainStackRef}>
+      <NavigationContainer ref={mainStackRef} theme={navigationTheme}>
         <SidebarProvider>
           <MenuSheetProvider>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -61,10 +80,10 @@ const AppNavigator = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   loading: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 999,

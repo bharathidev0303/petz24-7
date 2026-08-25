@@ -20,6 +20,9 @@ import BookingDetailScreen from '../screens/authorized/BookingDetailScreen';
 import ContactScreen from '../screens/authorized/ContactScreen';
 import ManagePetScreen from '../screens/authorized/ManagePetScreen';
 import AddEditPetScreen from '../screens/authorized/AddEditPetScreen';
+import ChatDoctorScreen from '../screens/authorized/ChatDoctorScreen';
+import ChatDoctorBookingScreen from '../screens/authorized/ChatDoctorBookingScreen';
+import AppearanceScreen from '../screens/authorized/AppearanceScreen';
 
 const Stack = createStackNavigator();
 
@@ -53,6 +56,7 @@ const MainAppStack = () => (
     <Stack.Screen name="Search" component={SearchScreen} options={stackTransition} />
     <Stack.Screen name="Shop" component={ShopScreen} options={stackTransition} />
     <Stack.Screen name="Profile" component={ProfileScreen} options={stackTransition} />
+    <Stack.Screen name="Appearance" component={AppearanceScreen} options={stackTransition} />
     <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={stackTransition} />
     <Stack.Screen name="Checkout" component={CheckoutScreen} options={stackTransition} />
     <Stack.Screen name="OrderProcessing" component={OrderProcessingScreen} options={stackTransition} />
@@ -63,6 +67,8 @@ const MainAppStack = () => (
     <Stack.Screen name="StaticContent" component={StaticContentScreen} options={stackTransition} />
     <Stack.Screen name="Booking" component={BookingScreen} options={stackTransition} />
     <Stack.Screen name="DoctorBooking" component={DoctorBookingScreen} options={stackTransition} />
+    <Stack.Screen name="ChatDoctor" component={ChatDoctorScreen} options={stackTransition} />
+    <Stack.Screen name="ChatDoctorBooking" component={ChatDoctorBookingScreen} options={stackTransition} />
     <Stack.Screen name="QuickBooking" component={QuickBookingScreen} options={stackTransition} />
     <Stack.Screen name="MyBooking" component={MyBookingScreen} options={stackTransition} />
     <Stack.Screen name="BookingDetail" component={BookingDetailScreen} options={stackTransition} />

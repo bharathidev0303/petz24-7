@@ -6,11 +6,16 @@ import AppText from '../../components/AppText';
 import AppInput from '../../components/AppInput';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import { AppToastService } from '../../components/view/AppToast';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 import { addressAPI } from '../../api/address';
 import { getUserErrorMessage } from '../../utils/apiError';
 
-const Field = ({ label, value, onChangeText, ...props }) => (
+const Field = ({ label, value, onChangeText, ...props }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
+
+  return (
   <View style={styles.field}>
     <AppText style={styles.label}>{label}</AppText>
     <AppInput
@@ -22,7 +27,8 @@ const Field = ({ label, value, onChangeText, ...props }) => (
       {...props}
     />
   </View>
-);
+  );
+};
 
 const buildInitialForm = (user, address) => ({
   fname: address?.fname || user?.firstName || '',
@@ -36,6 +42,8 @@ const buildInitialForm = (user, address) => ({
 });
 
 const AddAddressScreen = () => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = useSelector(state => state.auth);
@@ -149,7 +157,7 @@ const AddAddressScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: colors.homeBody,

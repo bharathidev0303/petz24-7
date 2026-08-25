@@ -3,7 +3,8 @@ import { View, Modal, TouchableOpacity, StyleSheet, ScrollView } from 'react-nat
 import Button from '../Button';
 import AppView from '../AppView';
 import AppText from '../AppText';
-import { colors } from '../../styles/colors';
+import { useThemedStyles } from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeContext';
 
 const PRESET_RANGES = [
   { label: 'Last 7 days', days: 7 },
@@ -12,6 +13,8 @@ const PRESET_RANGES = [
 ];
 
 const DateRangePicker = ({ visible, onClose, handleChange, value }) => {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -87,7 +90,7 @@ const DateRangePicker = ({ visible, onClose, handleChange, value }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = colors => ({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   content: { backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12, padding: 16 },
   title: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
