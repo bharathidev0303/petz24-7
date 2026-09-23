@@ -80,7 +80,12 @@ export default function SplashScreen({ onFinish }) {
   );
 }
 
-const createStyles = colors => ({
+const createStyles = colors => {
+  const screenWidth = Dimensions.get('window').width;
+  const logoWidth = Math.min(screenWidth * 0.86, 320);
+  const logoHeight = logoWidth * (342 / 1024);
+
+  return {
   container: {
     flex: 1,
     backgroundColor: colors.white,
@@ -88,8 +93,8 @@ const createStyles = colors => ({
     justifyContent: 'center',
   },
   logoImage: {
-    width: 220,
-    height: 220,
+    width: logoWidth,
+    height: logoHeight,
   },
   messageContainer: {
     marginTop: 24,
@@ -125,4 +130,5 @@ const createStyles = colors => ({
     color: colors.secondaryText,
     fontWeight: '500',
   },
-});
+};
+};

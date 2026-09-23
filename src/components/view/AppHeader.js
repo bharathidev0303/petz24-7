@@ -176,8 +176,8 @@ const createStyles = colors => ({
     marginRight: 0,
   },
   logo: {
-    width: 92,
-    height: 32,
+    width: 118,
+    height: 39,
   },
   searchRow: {
     flex: 1,
