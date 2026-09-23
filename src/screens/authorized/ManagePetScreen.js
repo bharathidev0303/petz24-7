@@ -21,47 +21,136 @@ import { useTheme } from '../../theme/ThemeContext';
 import { petsAPI } from '../../api/pets';
 import { getUserPetImageUrl } from '../../config/env';
 import { getUserErrorMessage } from '../../utils/apiError';
+import { parseCalendarDate } from '../../components/modals/CalendarModal';
+
+const isValidPetDate = value => {
+  const raw = String(value || '').trim();
+  return raw && raw !== '0000-00-00' && !raw.startsWith('0000-00-00');
+};
+
+const computeAgeFromDob = dobStr => {
+  const dob = parseCalendarDate(dobStr);
+  if (!dob) return null;
+
+  const today = new Date();
+  let years = today.getFullYear() - dob.getFullYear();
+  let months = today.getMonth() - dob.getMonth();
+
+  if (today.getDate() < dob.getDate()) {
+    months -= 1;
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  return {
+    years: Math.max(years, 0),
+    months: Math.max(months, 0),
+  };
+};
+
+const formatGender = value => {
+  const raw = String(value || '').trim().toLowerCase();
+  if (!raw) return null;
+  if (raw === 'm' || raw.startsWith('male')) return 'Male';
+  if (raw === 'f' || raw.startsWith('female')) return 'Female';
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+};
 
 const formatAge = pet => {
   const parts = [];
-  if (pet.age_year) parts.push(`${pet.age_year}y`);
-  if (pet.age_month) parts.push(`${pet.age_month}m`);
+  const years = Number(pet.age_year);
+  const months = Number(pet.age_month);
+
+  if (Number.isFinite(years) && years > 0) parts.push(`${years}y`);
+  if (Number.isFinite(months) && months > 0) parts.push(`${months}m`);
+
+  if (!parts.length && isValidPetDate(pet.date_of_birth)) {
+    const computed = computeAgeFromDob(pet.date_of_birth);
+    if (computed?.years > 0) parts.push(`${computed.years}y`);
+    if (computed?.months > 0) parts.push(`${computed.months}m`);
+  }
+
   return parts.length ? parts.join(' ') : null;
+};
+
+const formatDob = value => {
+  if (!isValidPetDate(value)) return null;
+
+  const normalized = String(value).trim().replace(' ', 'T');
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) {
+    return String(value).trim();
+  }
+
+  return date.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 };
 
 const PetCard = ({ pet, onEdit, onDelete }) => {
   const styles = useThemedStyles(createStyles);
-  const { colors } = useTheme();
   const imageUri = getUserPetImageUrl(pet.pet_img);
   const ageText = formatAge(pet);
+  const genderText = formatGender(pet.gender);
+  const dobText = formatDob(pet.date_of_birth);
 
   return (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
-        <View style={styles.cardTop}>
-          {imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.petImage} />
-          ) : (
-            <View style={[styles.petImage, styles.petImagePlaceholder]}>
-              <AppText style={styles.petInitial}>{(pet.name || pet.pet_name || '?').charAt(0)}</AppText>
-            </View>
-          )}
-
-          <View style={styles.cardInfo}>
-            <AppText style={styles.petName}>{pet.name || 'Unnamed Pet'}</AppText>
-            <AppText style={styles.metaText}>{pet.pet_name || '—'}</AppText>
-            {pet.breed_name ? <AppText style={styles.metaText}>{pet.breed_name}</AppText> : null}
-            <View style={styles.metaRow}>
-              {pet.gender ? (
-                <AppText style={styles.chip}>{pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1)}</AppText>
-              ) : null}
-              {ageText ? <AppText style={styles.chip}>{ageText}</AppText> : null}
-              {pet.date_of_birth ? <AppText style={styles.chip}>{pet.date_of_birth}</AppText> : null}
-            </View>
+      <View style={styles.cardRow}>
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.petImage} />
+        ) : (
+          <View style={[styles.petImage, styles.petImagePlaceholder]}>
+            <AppText style={styles.petInitial}>{(pet.name || pet.pet_name || '?').charAt(0)}</AppText>
           </View>
-        </View>
+        )}
 
-        <ListCardActions onEdit={() => onEdit(pet)} onDelete={() => onDelete(pet)} />
+        <View style={styles.cardBody}>
+          <View style={styles.titleRow}>
+            <AppText style={styles.petName} numberOfLines={1}>
+              {pet.name || 'Unnamed Pet'}
+            </AppText>
+            <ListCardActions onEdit={() => onEdit(pet)} onDelete={() => onDelete(pet)} />
+          </View>
+
+          <AppText style={styles.metaText} numberOfLines={1}>
+            {pet.pet_name || '—'}
+          </AppText>
+          {pet.breed_name ? (
+            <AppText style={styles.metaText} numberOfLines={1}>
+              {pet.breed_name}
+            </AppText>
+          ) : null}
+
+          {(genderText || ageText) ? (
+            <View style={styles.metaRow}>
+              {genderText ? (
+                <View style={styles.chip}>
+                  <AppText fontFamily="Regular" style={styles.chipText}>
+                    {genderText}
+                  </AppText>
+                </View>
+              ) : null}
+              {ageText ? (
+                <View style={styles.chip}>
+                  <AppText fontFamily="Regular" style={styles.chipText}>
+                    {ageText}
+                  </AppText>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+
+          {dobText ? (
+            <AppText style={styles.dobText} numberOfLines={1}>
+              DOB: {dobText}
+            </AppText>
+          ) : null}
+        </View>
       </View>
     </View>
   );
@@ -240,14 +329,9 @@ const createStyles = colors => ({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  cardHeader: {
+  cardRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 8,
-  },
-  cardTop: {
-    flex: 1,
-    flexDirection: 'row',
     gap: 14,
   },
   petImage: {
@@ -266,14 +350,23 @@ const createStyles = colors => ({
     fontWeight: '700',
     color: colors.primary,
   },
-  cardInfo: {
+  cardBody: {
     flex: 1,
+    minWidth: 0,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginBottom: 4,
   },
   petName: {
+    flex: 1,
+    minWidth: 0,
     fontSize: 17,
     fontWeight: '700',
     color: colors.primaryText,
-    marginBottom: 4,
   },
   metaText: {
     fontSize: 14,
@@ -287,13 +380,22 @@ const createStyles = colors => ({
     marginTop: 8,
   },
   chip: {
+    backgroundColor: '#FFF5ED',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  chipText: {
     fontSize: 12,
     color: colors.primaryText,
-    backgroundColor: '#FFF5ED',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    overflow: 'hidden',
+    lineHeight: 16,
+  },
+  dobText: {
+    fontSize: 12,
+    color: colors.secondaryText,
+    marginTop: 12,
+    paddingTop: 4,
   },
   emptyWrap: {
     alignItems: 'center',

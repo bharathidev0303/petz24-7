@@ -26,14 +26,19 @@ import {
   getQuantityVariant,
   resolveSelectedQuantity,
 } from '../../utils/productQuantity';
+import {
+  clampOrderQuantity,
+  getMaxOrderQuantity,
+  getStockMessage,
+  isOutOfStock,
+  validateOrderQuantity,
+} from '../../utils/productStock';
 
 const TABS = [
   { id: 'summary', label: 'Summary' },
   { id: 'description', label: 'Description' },
   { id: 'instruction', label: 'Instructions' },
 ];
-
-const MAX_BOX_UNIT = 99;
 
 const ProductDetailScreen = () => {
   const styles = useThemedStyles(createStyles);
@@ -77,7 +82,7 @@ const ProductDetailScreen = () => {
               q => String(q.quantity).toLowerCase() === previewQtyLabel.toLowerCase(),
             )
           : null;
-      const inStock = data.quantities?.find(q => Number(q.stock) > 0);
+      const inStock = data.quantities?.find(q => !isOutOfStock(q.stock));
       setSelectedQty(preferredQty || inStock || data.quantities?.[0] || null);
     } catch (err) {
       setError(err.message || 'Failed to load product');
@@ -111,6 +116,16 @@ const ProductDetailScreen = () => {
     fetchWishlistStatus();
   }, [fetchWishlistStatus]);
 
+  const outOfStock = isOutOfStock(selectedQty?.stock);
+  const maxBoxUnit = getMaxOrderQuantity(selectedQty?.stock);
+  const stockMessage = getStockMessage(selectedQty?.stock);
+  const isLowStockMessage = Boolean(stockMessage && !outOfStock);
+
+  useEffect(() => {
+    if (!selectedQty) return;
+    setBoxUnit(prev => clampOrderQuantity(prev, selectedQty.stock));
+  }, [selectedQty?.product_quantity_id, selectedQty?.stock]);
+
   const requireLogin = () => {
     AppToastService.show('Please sign in to continue', 'warning');
     return false;
@@ -132,7 +147,7 @@ const ProductDetailScreen = () => {
 
   const handleIncrease = () => {
     if (outOfStock) return;
-    setBoxUnit(prev => Math.min(MAX_BOX_UNIT, prev + 1));
+    setBoxUnit(prev => clampOrderQuantity(prev + 1, selectedQty?.stock));
   };
 
   const handleToggleWishlist = async () => {
@@ -170,6 +185,12 @@ const ProductDetailScreen = () => {
       return;
     }
 
+    const stockCheck = validateOrderQuantity(boxUnit, selectedQty?.stock);
+    if (!stockCheck.valid) {
+      AppToastService.show(stockCheck.message, 'warning');
+      return;
+    }
+
     setAddingToCart(true);
     try {
       await cartAPI.addToCart({
@@ -194,6 +215,12 @@ const ProductDetailScreen = () => {
     const qty = getResolvedQuantity();
     if (!qty?.quantity) {
       AppToastService.show('Please select a quantity', 'warning');
+      return;
+    }
+
+    const stockCheck = validateOrderQuantity(boxUnit, selectedQty?.stock);
+    if (!stockCheck.valid) {
+      AppToastService.show(stockCheck.message, 'warning');
       return;
     }
 
@@ -238,9 +265,8 @@ const ProductDetailScreen = () => {
     instruction: details?.instruction,
   }[activeTab];
 
-  const outOfStock = selectedQty && Number(selectedQty.stock) <= 0;
   const canDecrease = !outOfStock && boxUnit > 1;
-  const canIncrease = !outOfStock && boxUnit < MAX_BOX_UNIT;
+  const canIncrease = !outOfStock && boxUnit < maxBoxUnit;
 
   if (loading) {
     return (
@@ -298,7 +324,7 @@ const ProductDetailScreen = () => {
               {details.quantities.map(qty => {
                 const isSelected =
                   selectedQty?.product_quantity_id === qty.product_quantity_id;
-                const variantOutOfStock = Number(qty.stock) <= 0;
+                const variantOutOfStock = isOutOfStock(qty.stock);
 
                 return (
                   <Pressable
@@ -359,7 +385,13 @@ const ProductDetailScreen = () => {
               <AppText style={styles.stepperBtnText}>+</AppText>
             </Pressable>
           </View>
-          {outOfStock ? <AppText style={styles.stockNote}>Out of stock</AppText> : null}
+          {stockMessage ? (
+            <AppText
+              style={[styles.stockNote, isLowStockMessage && styles.lowStockNote]}
+              numberOfLines={2}>
+              {stockMessage}
+            </AppText>
+          ) : null}
         </View>
 
         <View style={styles.tabBar}>
@@ -409,24 +441,30 @@ const ProductDetailScreen = () => {
           )}
         </Pressable>
 
-        <View style={styles.actionRow}>
-          <Button
-            loading={addingToCart}
-            disabled={outOfStock || buyingNow}
-            backgroundColor={colors.white}
-            style={styles.cartBtn}
-            textStyle={styles.cartBtnText}
-            onPress={handleAddToCart}>
-            Add to Cart
-          </Button>
-          <Button
-            loading={buyingNow}
-            disabled={outOfStock || addingToCart}
-            style={styles.buyBtn}
-            onPress={handleBuyNow}>
-            Buy Now
-          </Button>
-        </View>
+        {outOfStock ? (
+          <View style={styles.outOfStockBanner}>
+            <AppText style={styles.outOfStockBannerText}>Out of Stock</AppText>
+          </View>
+        ) : (
+          <View style={styles.actionRow}>
+            <Button
+              loading={addingToCart}
+              disabled={buyingNow}
+              backgroundColor={colors.white}
+              style={styles.cartBtn}
+              textStyle={styles.cartBtnText}
+              onPress={handleAddToCart}>
+              Add to Cart
+            </Button>
+            <Button
+              loading={buyingNow}
+              disabled={addingToCart}
+              style={styles.buyBtn}
+              onPress={handleBuyNow}>
+              Buy Now
+            </Button>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -556,6 +594,9 @@ const createStyles = colors => ({
     color: colors.error,
     fontWeight: '600',
   },
+  lowStockNote: {
+    color: '#C77700',
+  },
   tabBar: {
     flexDirection: 'row',
     backgroundColor: colors.white,
@@ -622,6 +663,21 @@ const createStyles = colors => ({
   actionRow: {
     flexDirection: 'row',
     gap: 10,
+  },
+  outOfStockBanner: {
+    backgroundColor: '#FFF0F0',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#F5C2C2',
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  outOfStockBannerText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.error,
+    letterSpacing: 0.3,
   },
   cartBtn: {
     flex: 1,

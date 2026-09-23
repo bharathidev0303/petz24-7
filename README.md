@@ -95,3 +95,41 @@ To learn more about React Native, take a look at the following resources:
 - [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+
+# Standard release build
+npm run android:release
+
+# Clean + release build (recommended after icon/native changes)
+npm run android:release:clean
+
+
+
+# Check connected device/emulator
+npm run android:adb:devices
+# or: adb devices
+
+# Install release APK on device
+npm run android:adb:install
+# or: adb install -r android/app/build/outputs/apk/release/app-release.apk
+
+# Launch the app
+npm run android:adb:start
+# or: adb shell am start -n com.petz247/.MainActivity
+
+# Stop the app
+npm run android:adb:stop
+
+# Uninstall the app
+npm run android:adb:uninstall
+
+
+
+# Build release, install, and open app
+npm run android:release:run
+
+# Clean build + install + open app
+npm run android:release:clean:run
+
+
+npm run android:bundle
+# or clean: npm run android:bundle:clean

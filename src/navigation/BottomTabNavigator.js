@@ -67,7 +67,11 @@ const BottomTabNavigatorContent = () => {
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.secondaryText,
           tabBarLabelStyle: TAB_LABEL_STYLE,
-          tabBarStyle: menuOpen ? getTabBarStyleCompact(colors) : getTabBarStyle(colors),
+          tabBarStyle: sidebarOpen
+            ? { display: 'none' }
+            : menuOpen
+              ? getTabBarStyleCompact(colors)
+              : getTabBarStyle(colors),
           tabBarIcon: ({ color, size, focused }) => {
             const Icon = tabIcons[route.name];
             return Icon ? (

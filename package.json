@@ -8,6 +8,14 @@
     "android:bundle": "cd android && ./gradlew bundleRelease",
     "android:release:clean": "cd android && ./gradlew clean assembleRelease",
     "android:bundle:clean": "cd android && ./gradlew clean bundleRelease",
+    "android:adb:devices": "adb devices",
+    "android:adb:install": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
+    "android:adb:start": "adb shell am start -n com.petz247/.MainActivity",
+    "android:adb:stop": "adb shell am force-stop com.petz247",
+    "android:adb:uninstall": "adb uninstall com.petz247",
+    "android:release:install": "npm run android:release && npm run android:adb:install",
+    "android:release:run": "npm run android:release && npm run android:adb:install && npm run android:adb:start",
+    "android:release:clean:run": "npm run android:release:clean && npm run android:adb:install && npm run android:adb:start",
     "build:android:apk": "npm run android:release",
     "build:android:aab": "npm run android:bundle",
     "ios": "react-native run-ios",
@@ -30,6 +38,7 @@
     "react-native-safe-area-context": "^5.8.0",
     "react-native-screens": "^4.16.0",
     "react-native-svg": "^15.15.5",
+    "react-native-webview": "^14.0.1",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {

@@ -11,9 +11,9 @@ export const APP_ERROR_MESSAGES = {
   [APP_ERROR_CODES.SESSION_EXPIRED]: 'Your session has expired. Please sign in again.',
 };
 
-export const createAppError = (code, originalError) => {
+export const createAppError = (code, originalError, message) => {
   const error = new Error(
-    APP_ERROR_MESSAGES[code] || APP_ERROR_MESSAGES[APP_ERROR_CODES.REQUEST_FAILED],
+    message || APP_ERROR_MESSAGES[code] || APP_ERROR_MESSAGES[APP_ERROR_CODES.REQUEST_FAILED],
   );
   error.code = code;
   if (originalError) {
@@ -33,16 +33,24 @@ export const getUserErrorMessage = (
 ) => {
   if (!error) return fallback;
 
-  if (error.code && APP_ERROR_MESSAGES[error.code]) {
-    return APP_ERROR_MESSAGES[error.code];
+  const apiMessage = error.response?.msg || error.response?.message;
+  if (apiMessage) {
+    return String(apiMessage);
   }
 
-  if (Object.values(APP_ERROR_MESSAGES).includes(error.message)) {
+  if (
+    error.message &&
+    !Object.values(APP_ERROR_MESSAGES).includes(error.message)
+  ) {
     return error.message;
   }
 
   if (/network|fetch failed|internet|offline|timed out/i.test(String(error.message || ''))) {
     return APP_ERROR_MESSAGES[APP_ERROR_CODES.NO_INTERNET];
+  }
+
+  if (error.code && APP_ERROR_MESSAGES[error.code]) {
+    return APP_ERROR_MESSAGES[error.code];
   }
 
   return fallback;

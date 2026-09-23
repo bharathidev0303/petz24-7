@@ -4,7 +4,15 @@ import AppText from './AppText';
 import { useThemedStyles } from '../../theme/useThemedStyles';
 
 const { width } = Dimensions.get('window');
-const logoSource = require('../../assets/app-logo.png');
+const logoSource = require('../../assets/splash-logo.png');
+
+const SPLASH_TIMINGS = {
+  logoFadeMs: 600,
+  welcomeFadeMs: 700,
+  progressMs: 500,
+  loadingFadeMs: 200,
+  holdBeforeFinishMs: 1800,
+};
 
 export default function SplashScreen({ onFinish }) {
   const styles = useThemedStyles(createStyles);
@@ -17,14 +25,31 @@ export default function SplashScreen({ onFinish }) {
   useEffect(() => {
     Animated.sequence([
       Animated.parallel([
-        Animated.timing(logoFade, { toValue: 1, duration: 400, useNativeDriver: true }),
+        Animated.timing(logoFade, {
+          toValue: 1,
+          duration: SPLASH_TIMINGS.logoFadeMs,
+          useNativeDriver: true,
+        }),
         Animated.spring(logoScale, { toValue: 1, friction: 6, useNativeDriver: true }),
       ]),
-      Animated.timing(welcomeFade, { toValue: 1, duration: 500, useNativeDriver: true }),
-      Animated.timing(progressAnim, { toValue: 1, duration: 700, easing: Easing.linear, useNativeDriver: false }),
-      Animated.timing(loadingFade, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.timing(welcomeFade, {
+        toValue: 1,
+        duration: SPLASH_TIMINGS.welcomeFadeMs,
+        useNativeDriver: true,
+      }),
+      Animated.timing(progressAnim, {
+        toValue: 1,
+        duration: SPLASH_TIMINGS.progressMs,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }),
+      Animated.timing(loadingFade, {
+        toValue: 1,
+        duration: SPLASH_TIMINGS.loadingFadeMs,
+        useNativeDriver: true,
+      }),
     ]).start(() => {
-      if (onFinish) setTimeout(onFinish, 400);
+      if (onFinish) setTimeout(onFinish, SPLASH_TIMINGS.holdBeforeFinishMs);
     });
   }, [onFinish, logoFade, logoScale, welcomeFade, progressAnim, loadingFade]);
 
@@ -63,8 +88,8 @@ const createStyles = colors => ({
     justifyContent: 'center',
   },
   logoImage: {
-    width: 260,
-    height: 86,
+    width: 220,
+    height: 220,
   },
   messageContainer: {
     marginTop: 24,

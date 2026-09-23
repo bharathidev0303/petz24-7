@@ -196,7 +196,7 @@ class ApiClient {
         durationMs: Date.now() - startedAt,
         message: error?.message || 'Network Error',
       });
-      throw createAppError(APP_ERROR_CODES.NO_INTERNET, error);
+      throw createAppError(APP_ERROR_CODES.REQUEST_FAILED, error);
     }
 
     let data = {};
@@ -291,7 +291,7 @@ class ApiClient {
   postUrlEncoded(endpoint, params) {
     return this.request(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
       body: toUrlEncoded(params),
     });
   }

@@ -23,6 +23,11 @@ import {
   getQuantityVariant,
   resolveSelectedQuantity,
 } from '../../utils/productQuantity';
+import {
+  getStockMessage,
+  isOutOfStock,
+  validateOrderQuantity,
+} from '../../utils/productStock';
 
 const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) => {
   const styles = useThemedStyles(createStyles);
@@ -67,7 +72,7 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
                 q => String(q.quantity).toLowerCase() === previewQtyLabel.toLowerCase(),
               )
             : null;
-        const inStock = data.quantities?.find(q => Number(q.stock) > 0);
+        const inStock = data.quantities?.find(q => !isOutOfStock(q.stock));
         setSelectedQty(preferredQty || inStock || data.quantities?.[0] || null);
       } catch (err) {
         if (!cancelled) {
@@ -101,11 +106,21 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
     previewProduct?.min_price ||
     details?.quantities?.[0]?.price;
 
+  const outOfStock = isOutOfStock(selectedQty?.stock);
+  const stockMessage = getStockMessage(selectedQty?.stock);
+  const isLowStockMessage = Boolean(stockMessage && !outOfStock);
+
   const handleAddToCart = async () => {
     const qty = resolveSelectedQuantity(selectedQty, previewProduct);
 
     if (!qty?.quantity) {
       AppToastService.show('Please select a quantity', 'warning');
+      return;
+    }
+
+    const stockCheck = validateOrderQuantity(1, selectedQty?.stock);
+    if (!stockCheck.valid) {
+      AppToastService.show(stockCheck.message, 'warning');
       return;
     }
 
@@ -174,23 +189,23 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
                   {details.quantities.map(qty => {
                     const isSelected =
                       selectedQty?.product_quantity_id === qty.product_quantity_id;
-                    const outOfStock = Number(qty.stock) <= 0;
+                    const variantOutOfStock = isOutOfStock(qty.stock);
 
                     return (
                       <Pressable
                         key={qty.product_quantity_id}
-                        disabled={outOfStock}
+                        disabled={variantOutOfStock}
                         onPress={() => setSelectedQty(qty)}
                         style={[
                           styles.qtyChip,
                           isSelected && styles.qtyChipActive,
-                          outOfStock && styles.qtyChipDisabled,
+                          variantOutOfStock && styles.qtyChipDisabled,
                         ]}>
                         <AppText
                           style={[
                             styles.qtyText,
                             isSelected && styles.qtyTextActive,
-                            outOfStock && styles.qtyTextDisabled,
+                            variantOutOfStock && styles.qtyTextDisabled,
                           ]}>
                           {qty.quantity}
                         </AppText>
@@ -198,7 +213,7 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
                           style={[
                             styles.qtyPrice,
                             isSelected && styles.qtyTextActive,
-                            outOfStock && styles.qtyTextDisabled,
+                            variantOutOfStock && styles.qtyTextDisabled,
                           ]}>
                           Rs. {qty.price}
                         </AppText>
@@ -206,6 +221,13 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
                     );
                   })}
                 </View>
+                {stockMessage ? (
+                  <AppText
+                    style={[styles.stockNote, isLowStockMessage && styles.lowStockNote]}
+                    numberOfLines={2}>
+                    {stockMessage}
+                  </AppText>
+                ) : null}
               </View>
             ) : getQuantityLabel(previewProduct?.quantity) ? (
               <AppText style={styles.meta}>
@@ -224,9 +246,15 @@ const ProductPreviewModal = ({ visible, productId, previewProduct, onClose }) =>
               </View>
             ) : null}
 
-            <Button loading={adding} onPress={handleAddToCart} style={styles.cartBtn}>
-              Add to Cart
-            </Button>
+            {outOfStock ? (
+              <View style={styles.outOfStockBanner}>
+                <AppText style={styles.outOfStockBannerText}>Out of Stock</AppText>
+              </View>
+            ) : (
+              <Button loading={adding} onPress={handleAddToCart} style={styles.cartBtn}>
+                Add to Cart
+              </Button>
+            )}
           </ScrollView>
         </View>
       </View>
@@ -364,6 +392,15 @@ const createStyles = colors => ({
     color: colors.secondaryText,
     marginTop: 2,
   },
+  stockNote: {
+    marginTop: 8,
+    fontSize: 13,
+    color: colors.error,
+    fontWeight: '600',
+  },
+  lowStockNote: {
+    color: '#C77700',
+  },
   meta: {
     fontSize: 13,
     color: colors.secondaryText,
@@ -385,6 +422,22 @@ const createStyles = colors => ({
   },
   cartBtn: {
     marginTop: 4,
+  },
+  outOfStockBanner: {
+    marginTop: 4,
+    backgroundColor: '#FFF0F0',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#F5C2C2',
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  outOfStockBannerText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.error,
+    letterSpacing: 0.3,
   },
   error: {
     color: colors.error,

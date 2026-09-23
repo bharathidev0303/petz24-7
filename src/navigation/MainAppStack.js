@@ -22,6 +22,7 @@ import ManagePetScreen from '../screens/authorized/ManagePetScreen';
 import AddEditPetScreen from '../screens/authorized/AddEditPetScreen';
 import ChatDoctorScreen from '../screens/authorized/ChatDoctorScreen';
 import ChatDoctorBookingScreen from '../screens/authorized/ChatDoctorBookingScreen';
+import TawkChatScreen from '../screens/authorized/TawkChatScreen';
 import AppearanceScreen from '../screens/authorized/AppearanceScreen';
 
 const Stack = createStackNavigator();
@@ -69,6 +70,7 @@ const MainAppStack = () => (
     <Stack.Screen name="DoctorBooking" component={DoctorBookingScreen} options={stackTransition} />
     <Stack.Screen name="ChatDoctor" component={ChatDoctorScreen} options={stackTransition} />
     <Stack.Screen name="ChatDoctorBooking" component={ChatDoctorBookingScreen} options={stackTransition} />
+    <Stack.Screen name="TawkChat" component={TawkChatScreen} options={stackTransition} />
     <Stack.Screen name="QuickBooking" component={QuickBookingScreen} options={stackTransition} />
     <Stack.Screen name="MyBooking" component={MyBookingScreen} options={stackTransition} />
     <Stack.Screen name="BookingDetail" component={BookingDetailScreen} options={stackTransition} />

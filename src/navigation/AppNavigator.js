@@ -61,8 +61,8 @@ const AppNavigator = () => {
 
   return (
     <>
-      <NavigationContainer ref={mainStackRef} theme={navigationTheme}>
-        <SidebarProvider>
+      <SidebarProvider>
+        <NavigationContainer ref={mainStackRef} theme={navigationTheme}>
           <MenuSheetProvider>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               {isAuthenticated ? (
@@ -71,10 +71,10 @@ const AppNavigator = () => {
                 <Stack.Screen name="Auth" component={AuthStack} />
               )}
             </Stack.Navigator>
-            {isAuthenticated ? <AppSidebar /> : null}
           </MenuSheetProvider>
-        </SidebarProvider>
-      </NavigationContainer>
+        </NavigationContainer>
+        {isAuthenticated ? <AppSidebar /> : null}
+      </SidebarProvider>
       {loading && <LoadingScreen />}
     </>
   );

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from './apiClient';
 import { ENDPOINTS } from './endpoints';
+import { APP_ERROR_CODES, createAppError } from '../utils/apiError';
 
 const mapUser = data => ({
   id: data.user_id,
@@ -47,5 +48,17 @@ export const authAPI = {
   logout: async () => {
     await AsyncStorage.multiRemove(['authToken', 'userData']);
     return { success: true };
+  },
+
+  sendResetLink: async email => {
+    const response = await apiClient.postUrlEncoded(ENDPOINTS.SEND_RESET_LINK, { email });
+    const code = Number(response?.code);
+    if (Number.isFinite(code) && code >= 400) {
+      const message = response?.msg || response?.message || 'Could not send reset link';
+      const error = createAppError(APP_ERROR_CODES.REQUEST_FAILED, null, message);
+      error.response = response;
+      throw error;
+    }
+    return response;
   },
 };

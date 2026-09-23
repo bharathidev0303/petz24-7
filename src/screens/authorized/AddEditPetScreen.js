@@ -17,7 +17,11 @@ import AppText from '../../components/AppText';
 import AppInput from '../../components/AppInput';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
 import DropdownModal from '../../components/modals/dropdownModel';
-import CalendarModal, { parseCalendarDate } from '../../components/modals/CalendarModal';
+import CalendarModal, {
+  parseCalendarDate,
+  formatCalendarDisplay,
+  toCalendarDateString,
+} from '../../components/modals/CalendarModal';
 import Upload from '../../components/icons/Upload';
 import { AppToastService } from '../../components/view/AppToast';
 import { useThemedStyles } from '../../theme/useThemedStyles';
@@ -158,7 +162,7 @@ const AddEditPetScreen = () => {
             pet_id: String(initialPet.pet_id || ''),
             breed_id: String(initialPet.breed_id || ''),
             gender: initialPet.gender || '',
-            date_of_birth: initialPet.date_of_birth || '',
+            date_of_birth: toCalendarDateString(initialPet.date_of_birth),
             age_year: String(initialPet.age_year ?? ''),
             age_month: String(initialPet.age_month ?? ''),
             name: initialPet.name || '',
@@ -357,7 +361,7 @@ const AddEditPetScreen = () => {
             <SelectField
               label="Date of Birth"
               value={form.date_of_birth}
-              displayValue={form.date_of_birth}
+              displayValue={formatCalendarDisplay(form.date_of_birth)}
               placeholder="Select date of birth"
               onPress={() => setDropdown('date')}
             />

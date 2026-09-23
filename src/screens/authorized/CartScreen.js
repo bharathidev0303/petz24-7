@@ -20,6 +20,11 @@ import { useThemedStyles } from '../../theme/useThemedStyles';
 import { useTheme } from '../../theme/ThemeContext';
 import { getAssetUrl } from '../../config/env';
 import { cartAPI } from '../../api/cart';
+import {
+  getStockMessage,
+  isOutOfStock,
+  validateOrderQuantity,
+} from '../../utils/productStock';
 
 const getLineTotal = item => {
   const price = Number(item.product_price) || 0;
@@ -76,6 +81,9 @@ const CartScreen = () => {
   );
 
   const subtotal = items.reduce((sum, item) => sum + getLineTotal(item), 0);
+  const hasUnavailableItems = items.some(
+    item => isOutOfStock(item.stock) || !validateOrderQuantity(item.box_unit, item.stock).valid,
+  );
 
   const handleRemove = async cartId => {
     if (!user?.id || removingId) return;
@@ -94,6 +102,9 @@ const CartScreen = () => {
 
   const renderItem = ({ item }) => {
     const isRemoving = String(removingId) === String(item.cart_id);
+    const stockMessage = getStockMessage(item.stock);
+    const quantityIssue = validateOrderQuantity(item.box_unit, item.stock);
+    const showStockMessage = stockMessage || !quantityIssue.valid;
 
     return (
       <View style={styles.itemCard}>
@@ -116,10 +127,19 @@ const CartScreen = () => {
             </AppText>
             <View style={styles.priceRow}>
               <AppText style={styles.price}>Rs. {getLineTotal(item)}</AppText>
-              {Number(item.stock) <= 0 ? (
-                <AppText style={styles.outOfStock}>Out of stock</AppText>
-              ) : null}
             </View>
+            {showStockMessage ? (
+              <AppText
+                style={[
+                  styles.stockNote,
+                  !quantityIssue.valid || isOutOfStock(item.stock)
+                    ? styles.stockNoteError
+                    : styles.stockNoteWarning,
+                ]}
+                numberOfLines={2}>
+                {!quantityIssue.valid ? quantityIssue.message : stockMessage}
+              </AppText>
+            ) : null}
           </View>
         </TouchableOpacity>
         <TouchableOpacity
@@ -242,7 +262,15 @@ const CartScreen = () => {
         />
 
         <View style={styles.checkoutBar}>
-          <Button onPress={() => navigation.navigate('Checkout')}>Checkout</Button>
+          {hasUnavailableItems ? (
+            <AppText style={styles.checkoutWarning}>
+              Some items are out of stock or exceed available quantity. Remove or update them to
+              checkout.
+            </AppText>
+          ) : null}
+          <Button disabled={hasUnavailableItems} onPress={() => navigation.navigate('Checkout')}>
+            Checkout
+          </Button>
         </View>
       </View>
     </ScreenLayout>
@@ -362,6 +390,23 @@ const createStyles = colors => ({
     fontSize: 12,
     color: '#D14343',
     fontWeight: '600',
+  },
+  stockNote: {
+    marginTop: 6,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  stockNoteError: {
+    color: '#D14343',
+  },
+  stockNoteWarning: {
+    color: '#C77700',
+  },
+  checkoutWarning: {
+    fontSize: 13,
+    color: '#D14343',
+    lineHeight: 18,
+    marginBottom: 10,
   },
   footer: {
     marginTop: 8,

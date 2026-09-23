@@ -32,6 +32,7 @@ import { useTheme } from '../../theme/ThemeContext';
 
 const logoSource = require('../../assets/app-logo.png');
 const SIDEBAR_WIDTH = Dimensions.get('window').width * 0.78;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const SidebarMenuItem = ({ label, icon: Icon, onPress, index, visible }) => {
   const styles = useThemedStyles(createStyles);
@@ -136,8 +137,14 @@ const AppSidebar = () => {
   ];
 
   return (
-    <Modal visible={modalVisible} transparent animationType="none" onRequestClose={closeSidebar}>
-      <View style={styles.overlay} pointerEvents="box-none">
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      presentationStyle="overFullScreen"
+      onRequestClose={closeSidebar}>
+      <View style={[styles.overlay, { height: SCREEN_HEIGHT }]} pointerEvents="box-none">
         <Animated.View
           style={[styles.backdrop, { opacity: backdropAnim }]}
           pointerEvents={visible ? 'auto' : 'none'}>
@@ -150,8 +157,9 @@ const AppSidebar = () => {
             styles.sidebar,
             {
               width: SIDEBAR_WIDTH,
+              height: SCREEN_HEIGHT,
               paddingTop: insets.top + 16,
-              paddingBottom: insets.bottom + 16,
+              paddingBottom: Math.max(insets.bottom, 16),
               transform: [{ translateX: slideAnim }],
             },
           ]}>
@@ -193,16 +201,17 @@ const createStyles = colors => ({
   overlay: {
     flex: 1,
     flexDirection: 'row',
+    width: '100%',
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
+    height: SCREEN_HEIGHT,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   sidebar: {
     position: 'absolute',
     left: 0,
     top: 0,
-    bottom: 0,
     zIndex: 2,
     backgroundColor: colors.white,
     paddingHorizontal: 20,

@@ -1,7 +1,57 @@
+import { Platform } from 'react-native';
 import apiClient from './apiClient';
 import { ENDPOINTS } from './endpoints';
 
 const normalizeList = response => (Array.isArray(response) ? response : response?.data || []);
+
+const normalizeFileUri = uri => {
+  if (!uri) return uri;
+  if (
+    Platform.OS === 'android' &&
+    !uri.startsWith('file://') &&
+    !uri.startsWith('content://')
+  ) {
+    return `file://${uri}`;
+  }
+  return uri;
+};
+
+const appendEmptyPetImage = formData => {
+  // Match web: filename="" + application/octet-stream + empty body.
+  if (Platform.OS === 'android') {
+    // Blob/data URIs break Android fetch; bundled 0-byte file sends the empty file part.
+    formData.append('pet_img', {
+      uri: 'file:///android_asset/empty.bin',
+      name: '',
+      type: 'application/octet-stream',
+    });
+    return;
+  }
+
+  if (typeof Blob !== 'undefined') {
+    formData.append('pet_img', new Blob([], { type: 'application/octet-stream' }), '');
+    return;
+  }
+
+  formData.append('pet_img', {
+    uri: '',
+    name: '',
+    type: 'application/octet-stream',
+  });
+};
+
+const appendPetImage = (formData, petImg) => {
+  if (petImg?.uri) {
+    formData.append('pet_img', {
+      uri: normalizeFileUri(petImg.uri),
+      name: petImg.name || 'pet.jpg',
+      type: petImg.type || 'image/jpeg',
+    });
+    return;
+  }
+
+  appendEmptyPetImage(formData);
+};
 
 export const buildPetFormData = fields => {
   const formData = new FormData();
@@ -24,16 +74,7 @@ export const buildPetFormData = fields => {
     appendText('user_pety_id', fields.user_pety_id);
   }
 
-  if (fields.pet_img?.uri) {
-    formData.append('pet_img', {
-      uri: fields.pet_img.uri,
-      name: fields.pet_img.name || 'pet.jpg',
-      type: fields.pet_img.type || 'image/jpeg',
-    });
-  } else {
-    // API expects pet_img field even when keeping the existing image
-    formData.append('pet_img', '');
-  }
+  appendPetImage(formData, fields.pet_img);
 
   return formData;
 };

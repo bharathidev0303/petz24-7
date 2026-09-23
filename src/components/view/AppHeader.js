@@ -79,10 +79,15 @@ const AppHeader = ({
         barStyle={isDark ? 'light-content' : 'dark-content'}
         translucent={false}
       />
-      <View style={[styles.container, { paddingTop: insets.top + 8, backgroundColor: resolvedBackground }]}>
-        <View style={styles.row}>
+      <View
+        style={[
+          styles.container,
+          showLogo ? styles.containerWithLogo : styles.containerWithoutLogo,
+          { paddingTop: insets.top + 8, backgroundColor: resolvedBackground },
+        ]}>
+        <View style={[styles.row, showFilter && styles.rowWithFilter]}>
           {showLogo ? (
-            <Pressable onPress={handleLogoPress} hitSlop={8}>
+            <Pressable onPress={handleLogoPress} hitSlop={8} style={styles.logoWrap}>
               <Animated.View style={{ transform: [{ scale: logoScale }] }}>
                 <Image source={logoSource} style={styles.logo} resizeMode="contain" />
               </Animated.View>
@@ -144,28 +149,45 @@ const AppHeader = ({
 
 const createStyles = colors => ({
   container: {
-    paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  containerWithLogo: {
+    paddingLeft: 0,
+    paddingRight: 16,
+  },
+  containerWithoutLogo: {
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 0,
+  },
+  rowWithFilter: {
     gap: 10,
   },
+  logoWrap: {
+    paddingLeft: 0,
+    paddingRight: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
   logo: {
-    width: 96,
+    width: 92,
     height: 32,
   },
   searchRow: {
     flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 8,
     paddingVertical: 10,
-    gap: 8,
+    gap: 4,
   },
   searchInput: {
     flex: 1,
@@ -187,8 +209,8 @@ const createStyles = colors => ({
     color: colors.primaryText,
   },
   filterBtn: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

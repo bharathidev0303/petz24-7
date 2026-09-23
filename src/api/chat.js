@@ -65,6 +65,8 @@ const emptySubscription = () => ({
   duration: '',
   statusLabel: 'Inactive',
   chatUrl: '',
+  tawkPropertyId: '',
+  tawkWidgetId: '',
   subscribeUrl: `${API_CONFIG.BASE_URL}/chatbooking`,
 });
 
@@ -86,7 +88,15 @@ export const normalizeChatSubscription = response => {
     expiryDate: formatSubscriptionDate(payload.end_date ?? payload.expiry_date),
     duration: formatDuration(payload.duration),
     statusLabel: isActive ? 'Active Subscription' : 'Inactive',
-    chatUrl: String(payload.chat_url ?? payload.chat_link ?? payload.live_chat_url ?? '').trim(),
+    chatUrl: String(
+      payload.chat_url ??
+        payload.chat_link ??
+        payload.live_chat_url ??
+        payload.tawk_chat_url ??
+        '',
+    ).trim(),
+    tawkPropertyId: String(payload.tawk_property_id ?? payload.property_id ?? '').trim(),
+    tawkWidgetId: String(payload.tawk_widget_id ?? payload.widget_id ?? '').trim(),
     subscribeUrl: `${API_CONFIG.BASE_URL}/chatbooking`,
   };
 };

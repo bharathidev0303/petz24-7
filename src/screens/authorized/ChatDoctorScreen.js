@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 import AppText from '../../components/AppText';
 import Button from '../../components/Button';
 import SubScreenHeader from '../../components/view/SubScreenHeader';
@@ -16,6 +17,7 @@ import { chatAPI } from '../../api/chat';
 import { useThemedStyles } from '../../theme/useThemedStyles';
 import { useTheme } from '../../theme/ThemeContext';
 import { openExternalLink } from '../../utils/openExternalLink';
+import { openTawkChat } from '../../utils/tawkChat';
 
 const INACTIVE_FEATURES = [
   {
@@ -199,6 +201,7 @@ const ChatDoctorActiveView = ({ subscription, onStartPress, styles }) => (
 
 const ChatDoctorScreen = () => {
   const navigation = useNavigation();
+  const { user } = useSelector(state => state.auth);
   const styles = useThemedStyles(createStyles);
   const { colors } = useTheme();
   const [subscription, setSubscription] = useState(null);
@@ -231,7 +234,20 @@ const ChatDoctorScreen = () => {
 
   const handleStartChat = () => {
     if (subscription?.isActive) {
-      openExternalLink(subscription.chatUrl || subscription.subscribeUrl);
+      const opened = openTawkChat(navigation, {
+        chatUrl: subscription.chatUrl,
+        tawkPropertyId: subscription.tawkPropertyId,
+        tawkWidgetId: subscription.tawkWidgetId,
+        visitor: {
+          name: user?.name || '',
+          email: user?.email || '',
+          phone: user?.mobile || '',
+        },
+      });
+
+      if (!opened && subscription.chatUrl) {
+        openExternalLink(subscription.chatUrl);
+      }
       return;
     }
     navigation.navigate('ChatDoctorBooking');

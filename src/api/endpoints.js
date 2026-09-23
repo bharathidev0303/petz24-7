@@ -1,6 +1,7 @@
 export const ENDPOINTS = {
   LOGIN: '/api/login',
   SIGNUP: '/api/signup',
+  SEND_RESET_LINK: '/send-reset-link',
   MENU_ITEMS: '/api/menu-items',
   HOME_DYNAMIC_LIST: '/api/home-dynamic-list',
   COLLECTION_FILTERS: '/get-collection-filters',

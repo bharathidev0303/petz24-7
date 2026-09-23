@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import {
   View,
   TextInput,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   Image,
+  ScrollView,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -18,14 +18,17 @@ import { login, clearError } from '../../redux/slices/authSlice';
 
 const logoSource = require('../../assets/app-logo.png');
 
+const DEV_LOGIN_EMAIL = __DEV__ ? 'testdata@gmail.com' : '';
+const DEV_LOGIN_PASSWORD = __DEV__ ? '1234' : '';
+
 const LoginScreen = () => {
   const styles = useThemedStyles(createStyles);
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { loading, error } = useSelector(state => state.auth);
-  const [email, setEmail] = useState('testdata@gmail.com');
-  const [password, setPassword] = useState('1234');
+  const [email, setEmail] = useState(DEV_LOGIN_EMAIL);
+  const [password, setPassword] = useState(DEV_LOGIN_PASSWORD);
 
   const handleLogin = () => {
     dispatch(clearError());
@@ -35,8 +38,13 @@ const LoginScreen = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.card}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.card}>
         <Image source={logoSource} style={styles.logo} resizeMode="contain" />
         <AppText style={styles.subtitle}>Sign in to continue</AppText>
 
@@ -61,6 +69,10 @@ const LoginScreen = () => {
 
         {error ? <AppText style={styles.error}>{error}</AppText> : null}
 
+        <Pressable onPress={() => navigation.navigate('ForgotPassword')} style={styles.forgotWrap}>
+          <AppText style={styles.forgotText}>Forgot Password?</AppText>
+        </Pressable>
+
         <Button onPress={handleLogin} loading={loading}>
           Login
         </Button>
@@ -70,7 +82,8 @@ const LoginScreen = () => {
             New user? <AppText style={styles.linkHighlight}>Create an account</AppText>
           </AppText>
         </Pressable>
-      </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
@@ -79,8 +92,12 @@ const createStyles = colors => ({
   container: {
     flex: 1,
     backgroundColor: '#F5F7FA',
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
+    paddingVertical: 40,
   },
   card: {
     backgroundColor: colors.white,
@@ -110,6 +127,15 @@ const createStyles = colors => ({
   error: {
     color: colors.error,
     marginBottom: 12,
+  },
+  forgotWrap: {
+    alignSelf: 'flex-end',
+    marginBottom: 16,
+  },
+  forgotText: {
+    fontSize: 14,
+    color: colors.primary,
+    fontWeight: '600',
   },
   linkWrap: {
     marginTop: 20,

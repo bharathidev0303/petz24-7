@@ -5,6 +5,7 @@ import {
   View,
   StyleSheet,
   BackHandler,
+  useWindowDimensions,
 } from 'react-native';
 import AppText from '../AppText';
 import Button from '../Button';
@@ -34,23 +35,55 @@ export const formatCalendarDate = (year, monthIndex, day) =>
 
 export const parseCalendarDate = value => {
   if (!value) return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return null;
 
-  const year = Number(match[1]);
-  const monthIndex = Number(match[2]) - 1;
-  const day = Number(match[3]);
-  const date = new Date(year, monthIndex, day);
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
 
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== monthIndex ||
-    date.getDate() !== day
-  ) {
+  const buildDate = (year, monthIndex, day) => {
+    const date = new Date(year, monthIndex, day);
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== monthIndex ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+    return date;
+  };
+
+  let match = /^(\d{4})-(\d{2})-(\d{2})/.exec(trimmed);
+  if (match) {
+    return buildDate(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+
+  match = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/.exec(trimmed);
+  if (match) {
+    return buildDate(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
+  }
+
+  const parsed = new Date(trimmed.includes(' ') ? trimmed.replace(' ', 'T') : trimmed);
+  if (Number.isNaN(parsed.getTime())) {
     return null;
   }
 
-  return date;
+  return buildDate(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+};
+
+export const toCalendarDateString = value => {
+  const date = parseCalendarDate(value);
+  if (!date) return '';
+  return formatCalendarDate(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+export const formatCalendarDisplay = value => {
+  const date = parseCalendarDate(value);
+  if (!date) return String(value || '').trim();
+
+  return date.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 };
 
 const startOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -61,25 +94,29 @@ const CalendarModal = ({
   title = 'Select Date',
   value,
   onSelect,
-  maximumDate = new Date(),
+  maximumDate,
 }) => {
   const styles = useThemedStyles(createStyles);
-  const parsedValue = parseCalendarDate(value);
-  const maxDay = startOfDay(maximumDate);
+  const { width: windowWidth } = useWindowDimensions();
+  const dayCellSize = Math.floor((windowWidth - 32 - 28) / 7);
 
-  const [viewYear, setViewYear] = useState(maxDay.getFullYear());
-  const [viewMonth, setViewMonth] = useState(maxDay.getMonth());
-  const [selectedDate, setSelectedDate] = useState(parsedValue);
+  const [maxDay, setMaxDay] = useState(() => startOfDay(new Date()));
+  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     if (!visible) return;
 
+    const max = startOfDay(maximumDate instanceof Date ? maximumDate : new Date());
     const parsed = parseCalendarDate(value);
-    const initial = parsed || startOfDay(maximumDate);
+    const initial = parsed || max;
+
+    setMaxDay(max);
     setViewYear(initial.getFullYear());
     setViewMonth(initial.getMonth());
-    setSelectedDate(parsed);
-  }, [visible, value, maximumDate]);
+    setSelectedDate(parsed || max);
+  }, [visible, value]);
 
   useEffect(() => {
     if (!visible) return undefined;
@@ -218,6 +255,7 @@ const CalendarModal = ({
                       key={`day-${weekIndex}-${dayIndex}`}
                       style={[
                         styles.dayCell,
+                        { width: dayCellSize, height: dayCellSize },
                         selected && styles.dayCellSelected,
                         disabled && styles.dayCellDisabled,
                       ]}
@@ -322,11 +360,10 @@ const createStyles = colors => ({
   },
   weekRow: {
     flexDirection: 'row',
+    justifyContent: 'center',
     marginBottom: 4,
   },
   dayCell: {
-    flex: 1,
-    aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 999,

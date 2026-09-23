@@ -16,7 +16,11 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import AppText from '../AppText';
 import AppInput from '../AppInput';
 import DropdownModal from './dropdownModel';
-import CalendarModal, { parseCalendarDate } from './CalendarModal';
+import CalendarModal, {
+  parseCalendarDate,
+  formatCalendarDisplay,
+  toCalendarDateString,
+} from './CalendarModal';
 import Close from '../icons/Close';
 import Upload from '../icons/Upload';
 import { AppToastService } from '../view/AppToast';
@@ -166,7 +170,7 @@ const PetFormModal = ({ visible, mode = 'add', initialPet, userId, onClose, onSa
             pet_id: String(initialPet.pet_id || ''),
             breed_id: String(initialPet.breed_id || ''),
             gender: initialPet.gender || '',
-            date_of_birth: initialPet.date_of_birth || '',
+            date_of_birth: toCalendarDateString(initialPet.date_of_birth),
             age_year: String(initialPet.age_year ?? ''),
             age_month: String(initialPet.age_month ?? ''),
             name: initialPet.name || '',
@@ -394,7 +398,7 @@ const PetFormModal = ({ visible, mode = 'add', initialPet, userId, onClose, onSa
                   <SelectField
                     label="Date of Birth"
                     value={form.date_of_birth}
-                    displayValue={form.date_of_birth}
+                    displayValue={formatCalendarDisplay(form.date_of_birth)}
                     placeholder="Select date of birth"
                     onPress={() => setDropdown('date')}
                   />
