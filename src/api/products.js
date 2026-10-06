@@ -7,13 +7,15 @@ const appendArrayParams = (payload, key, values = []) => {
 };
 
 export const productsAPI = {
-  getCollectionFilters: ({ product_type_id, brandText = 'search' }) =>
+  getCollectionFilters: ({ pet_id, product_type_id, brandText = 'search' }) =>
     apiClient.postUrlEncoded(ENDPOINTS.COLLECTION_FILTERS, {
+      pet_id,
       product_type_id,
       brandText,
     }),
 
   getCollectionProducts: ({
+    pet_id,
     product_type_id,
     brandText = 'search',
     page = 1,
@@ -26,12 +28,18 @@ export const productsAPI = {
     veg = [],
   }) => {
     const payload = {
-      product_type_id,
       page,
       limit,
       priceOrder,
       brandText,
     };
+
+    if (pet_id !== undefined && pet_id !== null && String(pet_id).length > 0) {
+      payload.pet_id = pet_id;
+    }
+    if (product_type_id !== undefined && product_type_id !== null && String(product_type_id).length > 0) {
+      payload.product_type_id = product_type_id;
+    }
 
     if (startPrice !== undefined && startPrice !== null) {
       payload.startPrice = startPrice;

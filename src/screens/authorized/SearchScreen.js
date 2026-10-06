@@ -25,6 +25,7 @@ import { getAssetUrl } from '../../config/env';
 import { Close, VegNonVegIcon } from '../../components/icons';
 import { productsAPI } from '../../api/products';
 import { TAB_BAR_STYLE } from '../../navigation/tabBarConfig';
+import PetCategoriesModal from '../../components/modals/PetCategoriesModal';
 
 const PAGE_SIZE = 10;
 const MIN_SEARCH_LENGTH = 3;
@@ -64,9 +65,11 @@ const SearchScreen = () => {
   const route = useRoute();
   const insets = useSafeAreaInsets();
   const collectionProductTypeId = route.params?.product_type_id;
-  const collectionBrandText = route.params?.brandText;
-  const collectionTypeName = route.params?.typeName;
-  const isCollectionMode = Boolean(collectionProductTypeId && collectionBrandText);
+  const collectionBrandText = route.params?.brandText || route.params?.pet_name;
+  const collectionPetId = route.params?.pet_id;
+  const collectionPetName = route.params?.pet_name;
+  const collectionTypeName = route.params?.typeName || collectionPetName;
+  const isCollectionMode = Boolean((collectionPetId || collectionProductTypeId) && (collectionBrandText || collectionPetName));
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -92,6 +95,7 @@ const SearchScreen = () => {
   const [error, setError] = useState(null);
   const [autoFocus, setAutoFocus] = useState(!isCollectionMode);
   const [filtersVisible, setFiltersVisible] = useState(false);
+  const [categoriesVisible, setCategoriesVisible] = useState(false);
   const { openPreview } = useProductPreview();
   const runSearchRef = useRef(null);
   const loadCollectionRef = useRef(null);
@@ -101,18 +105,20 @@ const SearchScreen = () => {
     const trimmed = query.trim();
     if (trimmed.length >= MIN_SEARCH_LENGTH) {
       return {
+        pet_id: undefined,
         product_type_id: trimmed,
         brandText: 'search',
       };
     }
     if (isCollectionMode) {
       return {
+        pet_id: collectionPetId,
         product_type_id: collectionProductTypeId,
         brandText: collectionBrandText,
       };
     }
     return null;
-  }, [isCollectionMode, collectionProductTypeId, collectionBrandText, query]);
+  }, [isCollectionMode, collectionPetId, collectionProductTypeId, collectionBrandText, query]);
 
   useFocusEffect(
     useCallback(() => {
@@ -139,6 +145,7 @@ const SearchScreen = () => {
   }, [filtersVisible, navigation]);
 
   const fetchProducts = async ({
+    pet_id,
     product_type_id,
     brandText,
     nextPage = 1,
@@ -152,6 +159,7 @@ const SearchScreen = () => {
     maxPrice = endPrice,
   }) => {
     const response = await productsAPI.getCollectionProducts({
+      pet_id,
       product_type_id,
       brandText,
       page: nextPage,
@@ -190,6 +198,7 @@ const SearchScreen = () => {
 
     try {
       const filterResponse = await productsAPI.getCollectionFilters({
+        pet_id: collectionPetId,
         product_type_id: collectionProductTypeId,
         brandText: collectionBrandText,
       });
@@ -198,6 +207,7 @@ const SearchScreen = () => {
       setFilters(filterData);
 
       await fetchProducts({
+        pet_id: collectionPetId,
         product_type_id: collectionProductTypeId,
         brandText: collectionBrandText,
         nextPage: 1,
@@ -246,6 +256,7 @@ const SearchScreen = () => {
 
     try {
       const filterResponse = await productsAPI.getCollectionFilters({
+        pet_id: undefined,
         product_type_id: trimmed,
         brandText: 'search',
       });
@@ -254,6 +265,7 @@ const SearchScreen = () => {
       setFilters(filterData);
 
       await fetchProducts({
+        pet_id: undefined,
         product_type_id: trimmed,
         brandText: 'search',
         nextPage: 1,
@@ -281,7 +293,7 @@ const SearchScreen = () => {
       if (!isCollectionMode || query.trim().length > 0) return undefined;
       loadCollectionRef.current?.();
       return undefined;
-    }, [isCollectionMode, collectionProductTypeId, collectionBrandText, query]),
+    }, [isCollectionMode, collectionPetId, collectionProductTypeId, collectionBrandText, query]),
   );
 
   useEffect(() => {
@@ -332,6 +344,7 @@ const SearchScreen = () => {
 
     try {
       await fetchProducts({
+        pet_id: requestParams.pet_id,
         product_type_id: requestParams.product_type_id,
         brandText: requestParams.brandText,
         nextPage: 1,
@@ -446,6 +459,7 @@ const SearchScreen = () => {
     setLoadingMore(true);
     try {
       await fetchProducts({
+        pet_id: collectionPetId,
         product_type_id: requestParams.product_type_id,
         brandText: requestParams.brandText,
         nextPage: page + 1,
@@ -468,7 +482,6 @@ const SearchScreen = () => {
     selectedBrands,
     selectedPets,
     selectedVeg,
-    priceOrder,
     startPrice,
     endPrice,
   ]);
@@ -517,23 +530,60 @@ const SearchScreen = () => {
   const showCollectionMeta =
     isCollectionMode && query.trim().length < MIN_SEARCH_LENGTH && collectionBrandText;
 
+  const collectionPet = {
+    pet_id: collectionPetId,
+    pet_name: collectionPetName,
+    types: route.params?.types || [],
+  };
+
+  const openCategory = (pet, category) => {
+    if (!category?.product_category_id) return;
+
+    setCategoriesVisible(false);
+    setQuery('');
+    navigation.setParams({
+      pet_id: pet.pet_id,
+      pet_name: pet.pet_name,
+      types: pet.types,
+      product_type_id: category.product_category_id,
+      brandText: pet.pet_name,
+      typeName: category.category,
+    });
+  };
+
   const renderCollectionMeta = () => (
     <View style={styles.collectionMetaRow}>
       <View style={styles.collectionMeta}>
-        <View style={styles.metaChip}>
-          <AppText style={styles.metaChipText}>{collectionMetaLabel}</AppText>
-        </View>
-        {collectionTypeName ? (
+        {collectionMetaLabel && collectionTypeName && collectionMetaLabel === collectionTypeName ? (
+          <View style={styles.metaChip}>
+            <AppText style={styles.metaChipText}>{collectionMetaLabel}</AppText>
+          </View>
+        ) : (
           <>
-            <AppText style={styles.metaDivider}>›</AppText>
-            <View style={[styles.metaChip, styles.metaChipAccent]}>
-              <AppText style={[styles.metaChipText, styles.metaChipTextAccent]}>
-                {collectionTypeName}
-              </AppText>
+            <View style={styles.metaChip}>
+              <AppText style={styles.metaChipText}>{collectionMetaLabel}</AppText>
             </View>
+            {collectionTypeName ? (
+              <>
+                <AppText style={styles.metaDivider}>›</AppText>
+                <View style={[styles.metaChip, styles.metaChipAccent]}>
+                  <AppText style={[styles.metaChipText, styles.metaChipTextAccent]}>
+                    {collectionTypeName}
+                  </AppText>
+                </View>
+              </>
+            ) : null}
           </>
-        ) : null}
+        )}
       </View>
+      {!isBrandCollection && collectionPet?.types?.length ? (
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={styles.categoryButton}
+          onPress={() => setCategoriesVisible(true)}>
+          <AppText style={styles.categoryButtonText}>Categories</AppText>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 
@@ -840,12 +890,21 @@ const SearchScreen = () => {
       </ScreenLayout>
 
       {renderFiltersModal()}
+      <PetCategoriesModal
+        visible={categoriesVisible}
+        pet={collectionPet}
+        onClose={() => setCategoriesVisible(false)}
+        onCategoryPress={openCategory}
+      />
     </>
   );
 };
 
 const createStyles = colors => ({
   collectionMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 4,
@@ -874,6 +933,19 @@ const createStyles = colors => ({
     color: colors.primaryText,
   },
   metaChipTextAccent: {
+    color: colors.primary,
+  },
+  categoryButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 20,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  categoryButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
     color: colors.primary,
   },
   metaDivider: {

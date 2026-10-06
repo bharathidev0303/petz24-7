@@ -149,12 +149,42 @@ const HealthTipsSection = ({ data }) => {
   );
 };
 
+const MenuListSection = ({ data, onPetPress }) => {
+  const styles = useThemedStyles(createStyles);
+  if (!data?.length) return null;
+
+  return (
+    <View style={styles.section}>
+      <AppText style={styles.sectionTitle}>Main Menu</AppText>
+      <View style={styles.menuGrid}>
+        {data
+          .filter(pet => pet?.pet_name)
+          .map(pet => (
+            <TouchableOpacity
+              key={pet.pet_id}
+              activeOpacity={0.9}
+              onPress={() => onPetPress?.(pet)}
+              style={styles.menuPetCard}>
+              {pet.pet_img ? (
+                <Image source={{ uri: getAssetUrl(pet.pet_img) }} style={styles.menuPetImage} />
+              ) : (
+                <View style={[styles.menuPetImage, styles.imagePlaceholder]} />
+              )}
+              <AppText style={styles.menuPetName}>{pet.pet_name}</AppText>
+            </TouchableOpacity>
+          ))}
+      </View>
+    </View>
+  );
+};
+
 const HomeScreen = () => {
   const styles = useThemedStyles(createStyles);
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { user } = useSelector(state => state.auth);
   const [homeData, setHomeData] = useState(null);
+  const [menuData, setMenuData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -168,8 +198,12 @@ const HomeScreen = () => {
         setLoading(true);
       }
       setError(null);
-      const response = await homeAPI.getHomeDynamicList();
-      setHomeData(response.data);
+      const [homeResponse, menuResponse] = await Promise.all([
+        homeAPI.getHomeDynamicList(),
+        homeAPI.getMenuItems(),
+      ]);
+      setHomeData(homeResponse.data);
+      setMenuData(menuResponse.data?.menu || []);
     } catch (err) {
       setError(err.message || 'Failed to load home data');
     } finally {
@@ -212,6 +246,18 @@ const HomeScreen = () => {
 
   const openShop = () => {
     navigation.navigate('Shop');
+  };
+
+  const openMainMenuItem = pet => {
+    if (!pet?.pet_id) return;
+
+    navigation.navigate('Search', {
+      pet_id: pet.pet_id,
+      pet_name: pet.pet_name,
+      types: pet.types || [],
+      brandText: pet.pet_name,
+      typeName: pet.pet_name,
+    });
   };
 
   const renderContent = () => {
@@ -257,6 +303,8 @@ const HomeScreen = () => {
             onChatPress={openChatWithDoctor}
             onPharmacyPress={openVetPharmacy}
           />
+
+          <MenuListSection data={menuData} onPetPress={openMainMenuItem} />
 
           <Section title="Featured Products" data={homeData?.products} onProductPress={openPreview} />
           <Section title="New Arrivals" data={homeData?.newProducts} onProductPress={openPreview} showNewBadge />
@@ -451,6 +499,33 @@ const createStyles = colors => ({
     color: colors.primaryText,
     textAlign: 'center',
     width: '100%',
+  },
+  menuGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  menuPetCard: {
+    width: (SCREEN_WIDTH - 64) / 3,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  menuPetImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 8,
+    backgroundColor: '#f0f0f0',
+  },
+  menuPetName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.primaryText,
+    textAlign: 'center',
   },
   error: {
     color: colors.error,
